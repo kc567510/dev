@@ -1,0 +1,53 @@
+make a O-RU branch, maybe master or p2018_zcu102 branch
+
+將make好的O-RU放入SD Card，再放入板子裡面做開機，其中需注意三個必要程式BOOT.BIN、images.ub、root_final
+
+接著將 oam_agent folder and synergy_stack folder 放入/opt中
+
+至 /opt/synergy_stack/oam_sysrepo/yangmodel 執行command安裝欄位 ./install_ru_schema.sh  
+
+至 /opt/synergy_stack/oam_sysrepo/config 執行command設定參數 ./import_ru_config.sh
+
+至 /opt/oam_agent 執行 ./oam_agent.sh
+
+正常會顯示
+
+kpishm: attach kpi shm.
+run all processesrun /opt/oam_agent/oam_ofh_test
+Succeed to attach share memory.
+Init Request from App:
+[liboam] oam_capability_ind:
+
+[liboam] oam_agent_receiver_thread::create::
+
+oam_agent_receiver_thread::on_init::
+
+[liboam] oam_agent_receiver_thread::run::
+[INFO] Wait provision done ...
+[liboam] static_cfg_read:
+
+[APP] on_message_received::
+
+[APP] build config which get from OAM-IF
+
+[APP] --------------------------------------
+[INFO] ofh config version = 1
+
+[INFO] gCfgReadyBit: 11111111111111111111111111111111
+
+[APP] --------------------------------------
+[APP] send config response::
+[liboam] establish_confd_subscription_connection
+[liboam] establish_confd_subscription_connection down
+[Info] Get OFH cfg from synKPI_oamif to OFH own cfg DB
+[Info][OFH] nebyteorderswap = 0
+[Info] Do Fapi_Init() with ofh_cfg_ver = [1] ...
+[INFO] processing ...
+[INFO] processing ...
+[INFO] processing ...
+[INFO] processing ...
+[INFO] processing ...
+
+
+接著便可順利執行 nertopeer2-server 與client端連線
+

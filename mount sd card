@@ -1,0 +1,4 @@
+mount mmcblk0p1 mnt/mydrive //掛載disk
+umount mmcblk0p1 //卸載disk，有掛載一定要卸載
+
+cp or mv files to mnt/mydrive //掛載後才可以移動檔案或資料夾至disk內

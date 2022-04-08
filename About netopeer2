@@ -1,0 +1,87 @@
+#PATH
+    /home/kevin/testBuildO-RU/o-ru/vranstack/oam/ofh/liboam/build/oam/bin/ //liboamagent.ofh.so libsynergykpi.so oam_ofh_test at master branch on 172.19.67.12
+    /home/kevin/test_ORU_2018ZCU102/o-ru/vranstack/synergy_kpi/apps/build/ 
+
+#Device Server端
+    netopeer2-server -d -v 2    //server端執行netopeer2-server
+    netopeer2-server -d -v 2 &  //可開啟netopeer2-server並在前台執行
+
+    #Call-Home procedure from server
+        sysrepocfg --import=ssh_callhome.xml --format=xml --datastore=running --module=ietf-netconf-server
+
+
+#VM Client端
+    帳密: liteon
+
+    開啟VM候登入liteon (密碼為Liteon) 開啟terminal後
+    cd NETCONF-Client
+
+    cat EDITLiteonGNBReboot.xml (可用vi指令修改當中的false為true測試UCI)
+
+    netopeer2-cli //client端執行netopeer2-cli
+
+    connect --ssh --host 172.19.205.123 --port 830 --login root
+
+    pswd: root
+
+    sudo su - //切換為root帳戶，如果要用call home(listen 連線)這行指令可先切至root便可連線
+
+    subscribe --stream NETCONF
+
+    edit-config --target running --config=EDITLiteonGNBReboot.xml //修改後可測試
+
+    user-rpc --content SWM_install_rpc.xml //send rpc to netopeer2-server
+
+    > edit-config --target running --config=tmp/test.xml
+    OK
+    
+    #Call-Home procedure from client
+        > edit-config --target running --config=ssh_callhome.xml
+
+    #Retrieval data without filter
+        > get-config --source running
+
+    #Retrieval data with filter by xpath
+        > get-config --source running --filter-xpath /ietf-netconf-server:netconf-server/listen/endpoint/name
+        DATA
+        <netconf-server xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server">
+        <listen>
+            <endpoint>
+            <name>default-ssh</name>
+            </endpoint>
+        </listen>
+        </netconf-server>
+
+        > get-config --source running --filter-xpath /_3gpp_nr_nrm:ME/GNBDUFunction/gNBDUName
+        DATA
+        <ME xmlns="urn:3gpp:tsg:sa5:nrm:ngran">
+        <GNBDUFunction>
+        <id>0</id>
+        <gNBDUName>LITEON-DU-A001</gNBDUName>
+        </GNBDUFunction>
+        </ME>
+
+
+#About PYANG & XPATH
+    pyang -f tree _3gpp_nr_nrm.yang //可將yang結構以樹狀呈現，方便讀取XPATH
+    
+    //執行結果大概如下面所示
+
+    root@netconfclient:/home/liteon/netconf-client-test/Netopeer2/modules# pyang -f tree ietf-netconf-server@2019-07-02.yang 
+    ietf-netconf-server@2019-07-02.yang:6: error: module "ietf-yang-types" not found in search path
+    module: ietf-netconf-server
+    +--rw netconf-server
+        +--rw listen! {ssh-listen or tls-listen}?
+        |  +--rw idle-timeout?   uint16
+        |  +--rw endpoint* [name]
+        |     +--rw name         string
+        |     +--rw (transport)
+        |        +--:(ssh) {ssh-listen}?
+        |        |  +--rw ssh
+        |        |     +--rw tcp-server-parameters
+        |        |     |  +--rw local-address    inet:ip-address
+        |        |     |  +--rw local-port?      inet:port-number
+        |        |     |  +--rw keepalives! {keepalives-supported}?
+        |        |     |     +--rw idle-time         uint16
+        |        |     |     +--rw max-probes        uint16
+        |        |     |     +--rw probe-interval    uint16

@@ -1,0 +1,16 @@
+./oam_ofh_test &
+export LD_LIBRARY_PATH=/opt/oam_agent:$LD_LIBRARY_PATH
+./oam_ofh_test &   //加入&，可以使程式於背景執行
+sysrepocfg -X | more
+ 
+./import_ru_config.sh   //設定參數 at \synergy_stack\oam_sysrepo\config
+sysrepoctl -l          // list all information
+ 
+./install_ru_schema.sh   //安裝欄位 at \synergy_stack\oam_sysrepo\yangmodel
+ 
+./import_ru_config.sh
+sysrepocfg -X | more  
+  
+./oam_agent.sh  //C:\Upload_to_Board\oam
+
+sysrepoctl -l

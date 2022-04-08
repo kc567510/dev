@@ -1,0 +1,11 @@
+開啟 3CDaemon
+
+FTP Server -> Configure FTP Server
+
+點選cisco 
+
+設定user directory ex: C:\images\ (可自己新增資料夾)
+
+設定密碼 ex: 123456
+
+點選save profile -> 確定

@@ -1,0 +1,33 @@
+/home/kevin/testBuildO-RU/o-ru/vranstack/oam/ofh/liboam/build/oam/bin/ //liboamagent.ofh.so libsynergykpi.so oam_ofh_test at master branch on 172.19.67.12
+
+/home/kevin/test_ORU_2018ZCU102/o-ru/vranstack/synergy_kpi/apps/build/ 
+
+
+#netopeer2-server -d -v 2 &  //可開啟netopeer2-server並在前台執行
+
+
+sysrepocfg --import=ssh_callhome.xml --format=xml --datastore=running --module=ietf-netconf-server
+
+edit-config --target running --config=./example_configuration/ssh_callhome.xml
+
+edit-config --target running --config=/opt/liteon/netopeer2/example_configuration/hello.xml
+
+
+> get-config --source running --filter-xpath /_3gpp_nr_nrm:ME/GNBDUFunction/gNBDUName
+
+DATA
+<ME xmlns="urn:3gpp:tsg:sa5:nrm:ngran">
+<GNBDUFunction>
+<id>0</id>
+<gNBDUName>gnb01du</gNBDUName>
+</GNBDUFunction>
+</ME>
+
+>
+> edit-config --target running --config=/tmp/test.xml
+OK
+>
+
+#
+
+#pyang -f tree _3gpp_nr_nrm.yang

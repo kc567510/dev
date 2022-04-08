@@ -1,0 +1,5 @@
+ifconfig (可看目前IP資訊)
+
+ifconfig eth0 172.19.xx.xx (指定硬改)
+
+dhclient eth0  (用DHCP動態自動取得IP)

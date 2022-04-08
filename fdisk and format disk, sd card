@@ -1,0 +1,24 @@
+fdisk /dev/mmcblk0
+
+m //for help
+d //for delete exist partition
+n //for create a new partition
+p //for print the disk status including exist partition
+w //for save change and quit
+q //for quit without chage
+
+正常會切4個partition
+大小分別是 2G,2G,28G,28G (p1,p2,p3,p4)
+
+mkfs.vfat /dev/mmcblk0p1 //轉為FAT格式
+mkfs.vfat /dev/mmcblk0p2
+
+mkfs.ext4 /dev/mmcblk0p3 //轉為EXT4格式
+mkfs.ext4 /dev/mmcblk0p4
+
+
+三個燒入的開機程式(包含Boot, image and file system)路徑:/home/kevin/testBuildO-RU/output/release/images/ 
+
+BOOT 放P1
+Image 放P2
+root final(file system) 放P4
