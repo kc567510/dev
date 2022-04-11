@@ -13,7 +13,7 @@
 #VM Client端
     帳密: liteon
 
-    開啟VM候登入liteon (密碼為Liteon) 開啟terminal後
+    開啟VM後登入liteon (密碼為Liteon) 開啟terminal後
     cd NETCONF-Client
 
     cat EDITLiteonGNBReboot.xml (可用vi指令修改當中的false為true測試UCI)
@@ -28,12 +28,13 @@
 
     subscribe --stream NETCONF
 
-    edit-config --target running --config=EDITLiteonGNBReboot.xml //修改後可測試
-
-    user-rpc --content SWM_install_rpc.xml //send rpc to netopeer2-server
-
+    edit-config --target running --config=EDITLiteonGNBReboot.xml //觸發reboot 修改後可測試
+    
     > edit-config --target running --config=tmp/test.xml
     OK
+
+    #RPC Command
+        user-rpc --content SWM_install_rpc.xml //send rpc to netopeer2-server
     
     #Call-Home procedure from client
         > edit-config --target running --config=ssh_callhome.xml

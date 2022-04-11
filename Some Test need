@@ -31,3 +31,5 @@ OK
 #
 
 #pyang -f tree _3gpp_nr_nrm.yang
+
+cat /var/log/syslog | grep swmgr
