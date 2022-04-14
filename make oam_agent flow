@@ -49,5 +49,5 @@ oam_agent_receiver_thread::on_init::
 [INFO] processing ...
 
 
-接著便可順利執行 nertopeer2-server 與client端連線
+接著便可順利執行 nertopeer2-server與client端連線
 
