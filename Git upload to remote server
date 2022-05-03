@@ -1,5 +1,0 @@
-git status
-git add .
-git commit "此次更新的敘述"
-git push
-git status

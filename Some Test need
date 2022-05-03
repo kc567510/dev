@@ -33,3 +33,70 @@ OK
 #pyang -f tree _3gpp_nr_nrm.yang
 
 cat /var/log/syslog | grep swmgr
+
+
+vranstack\l2l3\ngran\cu\app_cu_up\src\oam_agent_thread.cpp
+ =>FM_CONFIG_REQ:  
+  =>gnb::fm::get_instance()->start_fm_timer(gnb::fm::get_instance(), 0, 30000); //fm_msg_hdlr.cpp
+  =>on_fm_timer_expiry_ind()  //fm.cpp
+ 
+ =>FM_TIMER_EXPIRY_IND
+  =>process_fm_timer_expiry_ind()  //fm_msg_hdlr.cpp
+   =>handle_fm_timer_expiry_ind(); //fm.cpp
+
+
+In Flexfi vs In O-RU
+  1.v change_cb()              //oam_agent_hdlr.cpp
+  2.v static_cfg_read()        //oam_agent_hdlr.cpp
+  3.x on_message_received()    //oam_agent_msg_hdlr.cpp    on_message_received() //oam_agent.cpp
+
+  4.x send_oam_in_msg_rx_ind() //oam_agent_msg_comm.cpp
+      => OAM_IN_MSG_RX_IND
+    
+  5.  gnb::oam_agent_thread::process_message(ngp::message_t* message) //oam_agent_thread.cpp
+        => case gnb::app_messaging::msg_num::OAM_IN_MSG_RX_IND:
+          => process_oam_in_msg_rx_ind(oam_in_msg_rx_ind);
+
+  6.  process_oam_in_msg_rx_ind() //oam_agent_msg_hdlr.cpp
+        => send_fm_config_req(fm_config_req); 
+
+  7.  send_fm_config_req() //oam_agent_msg_comm.cpp
+        => FM_CONFIG_REQ
+    
+    
+    
+
+
+
+    void gnb::oam_agent_thread::process_message(ngp::message_t* message) //oam_agent_thread.cpp
+    {
+    ....
+    ....
+    ....
+      case gnb::module_ids::FM:
+            {
+                switch (static_cast<gnb::app_messaging::msg_num>(message->msg_id))
+                {
+                   case gnb::app_messaging::msg_num::FM_TIMER_EXPIRY_IND:
+                   {
+                       gnb::fm_timer_expiry_ind* fm_timer_expiry_ind = static_cast<gnb::fm_timer_expiry_ind*>(message->data);
+                       fm_msg_hdlr->process_fm_timer_expiry_ind (fm_timer_expiry_ind); //call process_fm_timer_expiry_ind()
+                       delete fm_timer_expiry_ind;
+                       break;
+                   }
+                }
+            }
+    }
+     
+     gnb::ret gnb::fm_msg_hdlr::process_fm_timer_expiry_ind(gnb::fm_timer_expiry_ind* fm_timer_expiry_ind) //fm_msg_hdlr.cpp
+        => call handle_fm_timer_expiry_ind()
+
+     void gnb::fm::handle_fm_timer_expiry_ind() //fm.cpp
+        => check low device memory  
+
+
+
+get --filter-xpath "/o-ran-fm:active-alarm-list//." 
+
+rc = sr_oper_get_items_subscribe(gSrCdb.subs_sess, MODULE_ORAN_FM,
+    XPATH_ORAN_FM_ALARM_LIST, FMActiveAlarmListCb, NULL, 0, &gSrCdb.subscription);
