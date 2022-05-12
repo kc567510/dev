@@ -1,0 +1,38 @@
+pre-set 
+1. create reboot at /usr/local/fm_report/reboot //for touch
+2. mv /sbin/reboot /sbin/reboot_orig            //rename
+3. ln -s /sbin/reboot.sh /sbin/reboot           //reboot->reboot.sh
+
+
+//vi reboot.sh at /sbin
+#!/bin/sh
+
+#send fm notify to client.
+touch /usr/local/fm_report/reboot
+sleep 3
+
+#killall -9 gnb_du_pal
+#killall -9 gnb_du
+#killall -9 gnb_cu
+
+#blockdev --flushbufs /dev/mmcblk1p3
+#blockdev --flushbufs /dev/mmcblk1p4
+
+#sync
+#sync
+
+#The command killall5 -9 will forcefully terminate all running processes except your login shell, init, and kernel-specific processes.
+#killall5 -9
+#pid=$(ps aux | grep 'ssh' | awk '{print $2}' | awk '/START/{if (x)print x;x="";next}{x=(!x)?$0:x","$0;}END{print x;}')
+#killall5 -o $pid
+
+# reboot
+/sbin/reboot_orig
+//end 
+
+
+Test method
+connect netopeer2 server & client，and execute oam_agent
+
+$ reboot
+看看server是否有送alarm給client，3秒後重開
