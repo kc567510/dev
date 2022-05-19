@@ -62,6 +62,378 @@
         </GNBDUFunction>
         </ME>
 
+#About YANGLINT & XPATH
+    yanglint -f tree ietf-netconf-server@2019-07-02.yang //可將yang結構以樹狀呈現，方便讀取XPATH
+    //執行結果大概如下面所示
+
+root@o-ru:/opt/synergy_stack/netopeer2/modules# yanglint -f tree ietf-netconf-server@2019-07-02.yang
+module: ietf-netconf-server
+  +--rw netconf-server
+     +--rw listen! {ssh-listen or tls-listen}?
+     |  +--rw idle-timeout?   uint16 <3600>
+     |  +--rw endpoint* [name]
+     |     +--rw name          string
+     |     +--rw (transport)
+     |        +--:(ssh) {ssh-listen}?
+     |        |  +--rw ssh
+     |        |     +--rw tcp-server-parameters
+     |        |     |  +--rw local-address    ietf-inet-types:ip-address
+     |        |     |  +--rw local-port?      ietf-inet-types:port-number <830>
+     |        |     |  +--rw keepalives! {ietf-tcp-common:keepalives-supported}?
+     |        |     |     +--rw idle-time         uint16
+     |        |     |     +--rw max-probes        uint16
+     |        |     |     +--rw probe-interval    uint16
+     |        |     +--rw ssh-server-parameters
+     |        |        +--rw server-identity
+     |        |        |  +--rw host-key* [name]
+     |        |        |     +--rw name              string
+     |        |        |     +--rw (host-key-type)
+     |        |        |        +--:(public-key)
+     |        |        |        |  +--rw public-key
+     |        |        |        |     +--rw (local-or-keystore)
+     |        |        |        |        +--:(local) {ietf-keystore:local-definitions-supported}?
+     |        |        |        |        |  +--rw local-definition
+     |        |        |        |        |     +--rw algorithm            ietf-crypto-types:asymmetric-key-algorithm-t
+     |        |        |        |        |     +--rw public-key           binary
+     |        |        |        |        |     +--rw (private-key-type)
+     |        |        |        |        |        +--:(private-key)
+     |        |        |        |        |        |  +--rw private-key?   binary
+     |        |        |        |        |        +--:(hidden-private-key)
+     |        |        |        |        |        |  +--rw hidden-private-key?   empty
+     |        |        |        |        |        +--:(encrypted-private-key)
+     |        |        |        |        |           +--rw encrypted-private-key
+     |        |        |        |        |              +--rw (key-type)
+     |        |        |        |        |              |  +--:(symmetric-key-ref)
+     |        |        |        |        |              |  |  +--rw symmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:symmetric-keys/ietf-keystore:symmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+     |        |        |        |        |              |  +--:(asymmetric-key-ref)
+     |        |        |        |        |              |     +--rw asymmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+     |        |        |        |        |              +--rw value?       binary
+     |        |        |        |        +--:(keystore) {ietf-keystore:keystore-supported}?
+     |        |        |        |           +--rw keystore-reference?   ietf-keystore:asymmetric-key-ref
+     |        |        |        +--:(certificate)
+     |        |        |           +--rw certificate {ietf-ssh-common:ssh-x509-certs}?
+     |        |        |              +--rw (local-or-keystore)
+     |        |        |                 +--:(local) {ietf-keystore:local-definitions-supported}?
+     |        |        |                 |  +--rw local-definition
+     |        |        |                 |     +--rw algorithm                              ietf-crypto-types:asymmetric-key-algorithm-t
+     |        |        |                 |     +--rw public-key                             binary
+     |        |        |                 |     +--rw (private-key-type)
+     |        |        |                 |     |  +--:(private-key)
+     |        |        |                 |     |  |  +--rw private-key?   binary
+     |        |        |                 |     |  +--:(hidden-private-key)
+     |        |        |                 |     |  |  +--rw hidden-private-key?   empty
+     |        |        |                 |     |  +--:(encrypted-private-key)
+     |        |        |                 |     |     +--rw encrypted-private-key
+     |        |        |                 |     |        +--rw (key-type)
+     |        |        |                 |     |        |  +--:(symmetric-key-ref)
+     |        |        |                 |     |        |  |  +--rw symmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:symmetric-keys/ietf-keystore:symmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+     |        |        |                 |     |        |  +--:(asymmetric-key-ref)
+     |        |        |                 |     |        |     +--rw asymmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+     |        |        |                 |     |        +--rw value?       binary
+     |        |        |                 |     +--rw cert?                                  ietf-crypto-types:end-entity-cert-cms
+     |        |        |                 |     +---n certificate-expiration
+     |        |        |                 |        +--ro expiration-date    ietf-yang-types:date-and-time
+     |        |        |                 |     +---x generate-certificate-signing-request
+     |        |        |                 |        +--rw input
+     |        |        |                 |        |  +---w subject       binary
+     |        |        |                 |        |  +---w attributes?   binary
+     |        |        |                 |        +--rw output
+     |        |        |                 |           +--ro certificate-signing-request    binary
+     |        |        |                 +--:(keystore) {ietf-keystore:keystore-supported}?
+     |        |        |                    +--rw keystore-reference
+     |        |        |                       +--rw asymmetric-key?   ietf-keystore:asymmetric-key-ref
+     |        |        |                       +--rw certificate?      -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key[ietf-keystore:name = current()/../asymmetric-key]/ietf-keystore:certificates/ietf-keystore:certificate/ietf-keystore:name
+     |        |        +--rw client-authentication
+     |        |        |  +--rw supported-authentication-methods
+     |        |        |  |  +--rw publickey?   empty
+     |        |        |  |  +--rw passsword?   empty
+     |        |        |  |  +--rw hostbased?   empty
+     |        |        |  |  +--rw none?        empty
+     |        |        |  |  +--rw other*       string
+     |        |        |  +--rw (local-or-external)
+     |        |        |     +--:(local) {ietf-ssh-server:local-client-auth-supported}?
+     |        |        |     |  +--rw users
+     |        |        |     |     +--rw user* [name]
+     |        |        |     |        +--rw name              string
+     |        |        |     |        +--rw password?         iana-crypt-hash:crypt-hash
+     |        |        |     |        +--rw authorized-key* [name]
+     |        |        |     |           +--rw name         string
+     |        |        |     |           +--rw algorithm    string
+     |        |        |     |           +--rw key-data     binary
+     |        |        |     +--:(external) {ietf-ssh-server:external-client-auth-supported}?
+     |        |        |        +--rw client-auth-defined-elsewhere?   empty
+     |        |        +--rw transport-params {ietf-ssh-server:ssh-server-transport-params-config}?
+     |        |        |  +--rw host-key
+     |        |        |  |  +--rw host-key-alg*   identityref
+     |        |        |  +--rw key-exchange
+     |        |        |  |  +--rw key-exchange-alg*   identityref
+     |        |        |  +--rw encryption
+     |        |        |  |  +--rw encryption-alg*   identityref
+     |        |        |  +--rw mac
+     |        |        |     +--rw mac-alg*   identityref
+     |        |        +--rw keepalives! {ietf-ssh-server:ssh-server-keepalives}?
+     |        |           +--rw max-wait?       uint16 <30>
+     |        |           +--rw max-attempts?   uint8 <3>
+     |        +--:(tls) {tls-listen}?
+     |           +--rw tls
+     |              +--rw tcp-server-parameters
+     |              |  +--rw local-address    ietf-inet-types:ip-address
+     |              |  +--rw local-port?      ietf-inet-types:port-number <6513>
+     |              |  +--rw keepalives! {ietf-tcp-common:keepalives-supported}?
+     |              |     +--rw idle-time         uint16
+     |              |     +--rw max-probes        uint16
+     |              |     +--rw probe-interval    uint16
+     |              +--rw tls-server-parameters
+     |                 +--rw server-identity
+     |                 |  +--rw (local-or-keystore)
+     |                 |     +--:(local) {ietf-keystore:local-definitions-supported}?
+     |                 |     |  +--rw local-definition
+     |                 |     |     +--rw algorithm                              ietf-crypto-types:asymmetric-key-algorithm-t
+     |                 |     |     +--rw public-key                             binary
+     |                 |     |     +--rw (private-key-type)
+     |                 |     |     |  +--:(private-key)
+     |                 |     |     |  |  +--rw private-key?   binary
+     |                 |     |     |  +--:(hidden-private-key)
+     |                 |     |     |  |  +--rw hidden-private-key?   empty
+     |                 |     |     |  +--:(encrypted-private-key)
+     |                 |     |     |     +--rw encrypted-private-key
+     |                 |     |     |        +--rw (key-type)
+     |                 |     |     |        |  +--:(symmetric-key-ref)
+     |                 |     |     |        |  |  +--rw symmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:symmetric-keys/ietf-keystore:symmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+     |                 |     |     |        |  +--:(asymmetric-key-ref)
+     |                 |     |     |        |     +--rw asymmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+     |                 |     |     |        +--rw value?       binary
+     |                 |     |     +--rw cert?                                  ietf-crypto-types:end-entity-cert-cms
+     |                 |     |     +---n certificate-expiration
+     |                 |     |        +--ro expiration-date    ietf-yang-types:date-and-time
+     |                 |     |     +---x generate-certificate-signing-request
+     |                 |     |        +--rw input
+     |                 |     |        |  +---w subject       binary
+     |                 |     |        |  +---w attributes?   binary
+     |                 |     |        +--rw output
+     |                 |     |           +--ro certificate-signing-request    binary
+     |                 |     +--:(keystore) {ietf-keystore:keystore-supported}?
+     |                 |        +--rw keystore-reference
+     |                 |           +--rw asymmetric-key?   ietf-keystore:asymmetric-key-ref
+     |                 |           +--rw certificate?      -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key[ietf-keystore:name = current()/../asymmetric-key]/ietf-keystore:certificates/ietf-keystore:certificate/ietf-keystore:name
+     |                 +--rw client-authentication!
+     |                 |  +--rw (required-or-optional)
+     |                 |  |  +--:(required)
+     |                 |  |  |  +--rw required?   empty
+     |                 |  |  +--:(optional)
+     |                 |  |     +--rw optional?   empty
+     |                 |  +--rw (local-or-external)
+     |                 |  |  +--:(local) {ietf-tls-server:local-client-auth-supported}?
+     |                 |  |  |  +--rw ca-certs?       ietf-truststore:certificates-ref {ietf-truststore:x509-certificates}?
+     |                 |  |  |  +--rw client-certs?   ietf-truststore:certificates-ref {ietf-truststore:x509-certificates}?
+     |                 |  |  +--:(external) {ietf-tls-server:external-client-auth-supported}?
+     |                 |  |     +--rw client-auth-defined-elsewhere?   empty
+     |                 |  +--rw cert-maps
+     |                 |     +--rw cert-to-name* [id]
+     |                 |        +--rw id             uint32
+     |                 |        +--rw fingerprint    ietf-x509-cert-to-name:tls-fingerprint
+     |                 |        +--rw map-type       identityref
+     |                 |        +--rw name           string
+     |                 +--rw hello-params {ietf-tls-server:tls-server-hello-params-config}?
+     |                 |  +--rw tls-versions
+     |                 |  |  +--rw tls-version*   identityref
+     |                 |  +--rw cipher-suites
+     |                 |     +--rw cipher-suite*   identityref
+     |                 +--rw keepalives! {ietf-tls-server:tls-server-keepalives}?
+     |                    +--rw max-wait?       uint16 <30>
+     |                    +--rw max-attempts?   uint8 <3>
+     +--rw call-home! {ssh-call-home or tls-call-home}?
+        +--rw netconf-client* [name]
+           +--rw name                  string
+           +--rw endpoints
+           |  +--rw endpoint* [name]
+           |     +--rw name          string
+           |     +--rw (transport)
+           |        +--:(ssh) {ssh-call-home}?
+           |        |  +--rw ssh
+           |        |     +--rw tcp-client-parameters
+           |        |     |  +--rw remote-address    ietf-inet-types:host
+           |        |     |  +--rw remote-port?      ietf-inet-types:port-number <4334>
+           |        |     |  +--rw local-address?    ietf-inet-types:ip-address {ietf-tcp-client:local-binding-supported}?
+           |        |     |  +--rw local-port?       ietf-inet-types:port-number <0> {ietf-tcp-client:local-binding-supported}?
+           |        |     |  +--rw keepalives! {ietf-tcp-common:keepalives-supported}?
+           |        |     |     +--rw idle-time         uint16
+           |        |     |     +--rw max-probes        uint16
+           |        |     |     +--rw probe-interval    uint16
+           |        |     +--rw ssh-server-parameters
+           |        |        +--rw server-identity
+           |        |        |  +--rw host-key* [name]
+           |        |        |     +--rw name              string
+           |        |        |     +--rw (host-key-type)
+           |        |        |        +--:(public-key)
+           |        |        |        |  +--rw public-key
+           |        |        |        |     +--rw (local-or-keystore)
+           |        |        |        |        +--:(local) {ietf-keystore:local-definitions-supported}?
+           |        |        |        |        |  +--rw local-definition
+           |        |        |        |        |     +--rw algorithm            ietf-crypto-types:asymmetric-key-algorithm-t
+           |        |        |        |        |     +--rw public-key           binary
+           |        |        |        |        |     +--rw (private-key-type)
+           |        |        |        |        |        +--:(private-key)
+           |        |        |        |        |        |  +--rw private-key?   binary
+           |        |        |        |        |        +--:(hidden-private-key)
+           |        |        |        |        |        |  +--rw hidden-private-key?   empty
+           |        |        |        |        |        +--:(encrypted-private-key)
+           |        |        |        |        |           +--rw encrypted-private-key
+           |        |        |        |        |              +--rw (key-type)
+           |        |        |        |        |              |  +--:(symmetric-key-ref)
+           |        |        |        |        |              |  |  +--rw symmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:symmetric-keys/ietf-keystore:symmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+           |        |        |        |        |              |  +--:(asymmetric-key-ref)
+           |        |        |        |        |              |     +--rw asymmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+           |        |        |        |        |              +--rw value?       binary
+           |        |        |        |        +--:(keystore) {ietf-keystore:keystore-supported}?
+           |        |        |        |           +--rw keystore-reference?   ietf-keystore:asymmetric-key-ref
+           |        |        |        +--:(certificate)
+           |        |        |           +--rw certificate {ietf-ssh-common:ssh-x509-certs}?
+           |        |        |              +--rw (local-or-keystore)
+           |        |        |                 +--:(local) {ietf-keystore:local-definitions-supported}?
+           |        |        |                 |  +--rw local-definition
+           |        |        |                 |     +--rw algorithm                              ietf-crypto-types:asymmetric-key-algorithm-t
+           |        |        |                 |     +--rw public-key                             binary
+           |        |        |                 |     +--rw (private-key-type)
+           |        |        |                 |     |  +--:(private-key)
+           |        |        |                 |     |  |  +--rw private-key?   binary
+           |        |        |                 |     |  +--:(hidden-private-key)
+           |        |        |                 |     |  |  +--rw hidden-private-key?   empty
+           |        |        |                 |     |  +--:(encrypted-private-key)
+           |        |        |                 |     |     +--rw encrypted-private-key
+           |        |        |                 |     |        +--rw (key-type)
+           |        |        |                 |     |        |  +--:(symmetric-key-ref)
+           |        |        |                 |     |        |  |  +--rw symmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:symmetric-keys/ietf-keystore:symmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+           |        |        |                 |     |        |  +--:(asymmetric-key-ref)
+           |        |        |                 |     |        |     +--rw asymmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+           |        |        |                 |     |        +--rw value?       binary
+           |        |        |                 |     +--rw cert?                                  ietf-crypto-types:end-entity-cert-cms
+           |        |        |                 |     +---n certificate-expiration
+           |        |        |                 |        +--ro expiration-date    ietf-yang-types:date-and-time
+           |        |        |                 |     +---x generate-certificate-signing-request
+           |        |        |                 |        +--rw input
+           |        |        |                 |        |  +---w subject       binary
+           |        |        |                 |        |  +---w attributes?   binary
+           |        |        |                 |        +--rw output
+           |        |        |                 |           +--ro certificate-signing-request    binary
+           |        |        |                 +--:(keystore) {ietf-keystore:keystore-supported}?
+           |        |        |                    +--rw keystore-reference
+           |        |        |                       +--rw asymmetric-key?   ietf-keystore:asymmetric-key-ref
+           |        |        |                       +--rw certificate?      -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key[ietf-keystore:name = current()/../asymmetric-key]/ietf-keystore:certificates/ietf-keystore:certificate/ietf-keystore:name
+           |        |        +--rw client-authentication
+           |        |        |  +--rw supported-authentication-methods
+           |        |        |  |  +--rw publickey?   empty
+           |        |        |  |  +--rw passsword?   empty
+           |        |        |  |  +--rw hostbased?   empty
+           |        |        |  |  +--rw none?        empty
+           |        |        |  |  +--rw other*       string
+           |        |        |  +--rw (local-or-external)
+           |        |        |     +--:(local) {ietf-ssh-server:local-client-auth-supported}?
+           |        |        |     |  +--rw users
+           |        |        |     |     +--rw user* [name]
+           |        |        |     |        +--rw name              string
+           |        |        |     |        +--rw password?         iana-crypt-hash:crypt-hash
+           |        |        |     |        +--rw authorized-key* [name]
+           |        |        |     |           +--rw name         string
+           |        |        |     |           +--rw algorithm    string
+           |        |        |     |           +--rw key-data     binary
+           |        |        |     +--:(external) {ietf-ssh-server:external-client-auth-supported}?
+           |        |        |        +--rw client-auth-defined-elsewhere?   empty
+           |        |        +--rw transport-params {ietf-ssh-server:ssh-server-transport-params-config}?
+           |        |        |  +--rw host-key
+           |        |        |  |  +--rw host-key-alg*   identityref
+           |        |        |  +--rw key-exchange
+           |        |        |  |  +--rw key-exchange-alg*   identityref
+           |        |        |  +--rw encryption
+           |        |        |  |  +--rw encryption-alg*   identityref
+           |        |        |  +--rw mac
+           |        |        |     +--rw mac-alg*   identityref
+           |        |        +--rw keepalives! {ietf-ssh-server:ssh-server-keepalives}?
+           |        |           +--rw max-wait?       uint16 <30>
+           |        |           +--rw max-attempts?   uint8 <3>
+           |        +--:(tls) {tls-call-home}?
+           |           +--rw tls
+           |              +--rw tcp-client-parameters
+           |              |  +--rw remote-address    ietf-inet-types:host
+           |              |  +--rw remote-port?      ietf-inet-types:port-number <4335>
+           |              |  +--rw local-address?    ietf-inet-types:ip-address {ietf-tcp-client:local-binding-supported}?
+           |              |  +--rw local-port?       ietf-inet-types:port-number <0> {ietf-tcp-client:local-binding-supported}?
+           |              |  +--rw keepalives! {ietf-tcp-common:keepalives-supported}?
+           |              |     +--rw idle-time         uint16
+           |              |     +--rw max-probes        uint16
+           |              |     +--rw probe-interval    uint16
+           |              +--rw tls-server-parameters
+           |                 +--rw server-identity
+           |                 |  +--rw (local-or-keystore)
+           |                 |     +--:(local) {ietf-keystore:local-definitions-supported}?
+           |                 |     |  +--rw local-definition
+           |                 |     |     +--rw algorithm                              ietf-crypto-types:asymmetric-key-algorithm-t
+           |                 |     |     +--rw public-key                             binary
+           |                 |     |     +--rw (private-key-type)
+           |                 |     |     |  +--:(private-key)
+           |                 |     |     |  |  +--rw private-key?   binary
+           |                 |     |     |  +--:(hidden-private-key)
+           |                 |     |     |  |  +--rw hidden-private-key?   empty
+           |                 |     |     |  +--:(encrypted-private-key)
+           |                 |     |     |     +--rw encrypted-private-key
+           |                 |     |     |        +--rw (key-type)
+           |                 |     |     |        |  +--:(symmetric-key-ref)
+           |                 |     |     |        |  |  +--rw symmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:symmetric-keys/ietf-keystore:symmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+           |                 |     |     |        |  +--:(asymmetric-key-ref)
+           |                 |     |     |        |     +--rw asymmetric-key-ref?   -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key/ietf-keystore:name {ietf-keystore:keystore-supported}?
+           |                 |     |     |        +--rw value?       binary
+           |                 |     |     +--rw cert?                                  ietf-crypto-types:end-entity-cert-cms
+           |                 |     |     +---n certificate-expiration
+           |                 |     |        +--ro expiration-date    ietf-yang-types:date-and-time
+           |                 |     |     +---x generate-certificate-signing-request
+           |                 |     |        +--rw input
+           |                 |     |        |  +---w subject       binary
+           |                 |     |        |  +---w attributes?   binary
+           |                 |     |        +--rw output
+           |                 |     |           +--ro certificate-signing-request    binary
+           |                 |     +--:(keystore) {ietf-keystore:keystore-supported}?
+           |                 |        +--rw keystore-reference
+           |                 |           +--rw asymmetric-key?   ietf-keystore:asymmetric-key-ref
+           |                 |           +--rw certificate?      -> /ietf-keystore:keystore/ietf-keystore:asymmetric-keys/ietf-keystore:asymmetric-key[ietf-keystore:name = current()/../asymmetric-key]/ietf-keystore:certificates/ietf-keystore:certificate/ietf-keystore:name
+           |                 +--rw client-authentication!
+           |                 |  +--rw (required-or-optional)
+           |                 |  |  +--:(required)
+           |                 |  |  |  +--rw required?   empty
+           |                 |  |  +--:(optional)
+           |                 |  |     +--rw optional?   empty
+           |                 |  +--rw (local-or-external)
+           |                 |  |  +--:(local) {ietf-tls-server:local-client-auth-supported}?
+           |                 |  |  |  +--rw ca-certs?       ietf-truststore:certificates-ref {ietf-truststore:x509-certificates}?
+           |                 |  |  |  +--rw client-certs?   ietf-truststore:certificates-ref {ietf-truststore:x509-certificates}?
+           |                 |  |  +--:(external) {ietf-tls-server:external-client-auth-supported}?
+           |                 |  |     +--rw client-auth-defined-elsewhere?   empty
+           |                 |  +--rw cert-maps
+           |                 |     +--rw cert-to-name* [id]
+           |                 |        +--rw id             uint32
+           |                 |        +--rw fingerprint    ietf-x509-cert-to-name:tls-fingerprint
+           |                 |        +--rw map-type       identityref
+           |                 |        +--rw name           string
+           |                 +--rw hello-params {ietf-tls-server:tls-server-hello-params-config}?
+           |                 |  +--rw tls-versions
+           |                 |  |  +--rw tls-version*   identityref
+           |                 |  +--rw cipher-suites
+           |                 |     +--rw cipher-suite*   identityref
+           |                 +--rw keepalives! {ietf-tls-server:tls-server-keepalives}?
+           |                    +--rw max-wait?       uint16 <30>
+           |                    +--rw max-attempts?   uint8 <3>
+           +--rw connection-type
+           |  +--rw (connection-type)
+           |     +--:(persistent-connection)
+           |     |  +--rw persistent!
+           |     +--:(periodic-connection)
+           |        +--rw periodic!
+           |           +--rw period?         uint16 <60>
+           |           +--rw anchor-time?    ietf-yang-types:date-and-time
+           |           +--rw idle-timeout?   uint16 <120>
+           +--rw reconnect-strategy
+              +--rw start-with?     enumeration <first-listed>
+              +--rw max-attempts?   uint8 <3>
+
 
 #About PYANG & XPATH
     pyang -f tree _3gpp_nr_nrm.yang //可將yang結構以樹狀呈現，方便讀取XPATH
@@ -86,3 +458,62 @@
         |        |     |     +--rw idle-time         uint16
         |        |     |     +--rw max-probes        uint16
         |        |     |     +--rw probe-interval    uint16
+
+
+
+
+
+module: o-ran-usermgmt
+  +--rw users
+     +--rw user* [name]
+        +--rw name            ietf-netconf-acm:user-name-type
+        +--rw account-type?   enumeration <PASSWORD>
+        +--rw password?       password-type
+        +--rw enabled?        boolean
+
+  rpcs:
+    +---x chg-password
+       +---- input
+       |  +---w currentPassword       password-type
+       |  +---w newPassword           password-type
+       |  +---w newPasswordConfirm    password-type
+       +---- output
+          +--ro status            enumeration
+          +--ro status-message?   string
+
+
+
+module: ietf-netconf-acm
+  +--rw nacm
+     +--rw enable-nacm?              boolean <true>
+     +--rw read-default?             action-type <permit>
+     +--rw write-default?            action-type <deny>
+     +--rw exec-default?             action-type <permit>
+     +--rw enable-external-groups?   boolean <true>
+     +--ro denied-operations         ietf-yang-types:zero-based-counter32
+     +--ro denied-data-writes        ietf-yang-types:zero-based-counter32
+     +--ro denied-notifications      ietf-yang-types:zero-based-counter32
+     +--rw groups
+     |  +--rw group* [name]
+     |     +--rw name         group-name-type
+     |     +--rw user-name*   user-name-type
+     +--rw rule-list* [name]
+        +--rw name     string
+        +--rw group*   union
+        +--rw rule* [name]
+           +--rw name                 string
+           +--rw module-name?         union <*>
+           +--rw (rule-type)?
+           |  +--:(protocol-operation)
+           |  |  +--rw rpc-name?   union
+           |  +--:(notification)
+           |  |  +--rw notification-name?   union
+           |  +--:(data-node)
+           |     +--rw path    node-instance-identifier
+           +--rw access-operations?   union <*>
+           +--rw action               action-type
+           +--rw comment?             string
+
+
+get-config --source running --filter-xpath /ietf-netconf-acm:nacm/groups
+get-config --source running --filter-xpath /o-ran-usermgmt:users/user/name

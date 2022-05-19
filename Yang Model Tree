@@ -1,0 +1,199 @@
+module: o-ran-usermgmt
+  +--rw users
+     +--rw user* [name]
+        +--rw name            ietf-netconf-acm:user-name-type
+        +--rw account-type?   enumeration <PASSWORD>
+        +--rw password?       password-type
+        +--rw enabled?        boolean
+
+  rpcs:
+    +---x chg-password
+       +---- input
+       |  +---w currentPassword       password-type
+       |  +---w newPassword           password-type
+       |  +---w newPasswordConfirm    password-type
+       +---- output
+          +--ro status            enumeration
+          +--ro status-message?   string
+
+module: ietf-netconf-acm
+  +--rw nacm
+     +--rw enable-nacm?              boolean <true>
+     +--rw read-default?             action-type <permit>
+     +--rw write-default?            action-type <deny>
+     +--rw exec-default?             action-type <permit>
+     +--rw enable-external-groups?   boolean <true>
+     +--ro denied-operations         ietf-yang-types:zero-based-counter32
+     +--ro denied-data-writes        ietf-yang-types:zero-based-counter32
+     +--ro denied-notifications      ietf-yang-types:zero-based-counter32
+     +--rw groups
+     |  +--rw group* [name]
+     |     +--rw name         group-name-type
+     |     +--rw user-name*   user-name-type
+     +--rw rule-list* [name]
+        +--rw name     string
+        +--rw group*   union
+        +--rw rule* [name]
+           +--rw name                 string
+           +--rw module-name?         union <*>
+           +--rw (rule-type)?
+           |  +--:(protocol-operation)
+           |  |  +--rw rpc-name?   union
+           |  +--:(notification)
+           |  |  +--rw notification-name?   union
+           |  +--:(data-node)
+           |     +--rw path    node-instance-identifier
+           +--rw access-operations?   union <*>
+           +--rw action               action-type
+           +--rw comment?             string
+
+
+module: ietf-netconf-monitoring
+  +--ro netconf-state
+     +--ro capabilities
+     |  +--ro capability*   ietf-inet-types:uri
+     +--ro datastores
+     |  +--ro datastore* [name]
+     |     +--ro name     netconf-datastore-type
+     |     +--ro locks!
+     |        +--ro (lock-type)?
+     |           +--:(global-lock)
+     |           |  +--ro global-lock
+     |           |     +--ro locked-by-session    uint32
+     |           |     +--ro locked-time          ietf-yang-types:date-and-time
+     |           +--:(partial-lock)
+     |              +--ro partial-lock* [lock-id]
+     |                 +--ro lock-id              uint32
+     |                 +--ro locked-by-session    uint32
+     |                 +--ro locked-time          ietf-yang-types:date-and-time
+     |                 +--ro select*              ietf-yang-types:xpath1.0
+     |                 +--ro locked-node*         instance-identifier
+     +--ro schemas
+     |  +--ro schema* [identifier version format]
+     |     +--ro identifier    string
+     |     +--ro version       string
+     |     +--ro format        identityref
+     |     +--ro namespace     ietf-inet-types:uri
+     |     +--ro location*     union
+     +--ro sessions
+     |  +--ro session* [session-id]
+     |     +--ro session-id           uint32
+     |     +--ro transport            identityref
+     |     +--ro username             string
+     |     +--ro source-host?         ietf-inet-types:host
+     |     +--ro login-time           ietf-yang-types:date-and-time
+     |     +--ro in-rpcs?             ietf-yang-types:zero-based-counter32
+     |     +--ro in-bad-rpcs?         ietf-yang-types:zero-based-counter32
+     |     +--ro out-rpc-errors?      ietf-yang-types:zero-based-counter32
+     |     +--ro out-notifications?   ietf-yang-types:zero-based-counter32
+     +--ro statistics
+        +--ro netconf-start-time?   ietf-yang-types:date-and-time
+        +--ro in-bad-hellos?        ietf-yang-types:zero-based-counter32
+        +--ro in-sessions?          ietf-yang-types:zero-based-counter32
+        +--ro dropped-sessions?     ietf-yang-types:zero-based-counter32
+        +--ro in-rpcs?              ietf-yang-types:zero-based-counter32
+        +--ro in-bad-rpcs?          ietf-yang-types:zero-based-counter32
+        +--ro out-rpc-errors?       ietf-yang-types:zero-based-counter32
+        +--ro out-notifications?    ietf-yang-types:zero-based-counter32
+
+  rpcs:
+    +---x get-schema
+       +---- input
+       |  +---w identifier    string
+       |  +---w version?      string
+       |  +---w format?       identityref
+       +---- output
+          +--ro data?   anyxml
+
+module: o-ran-sync
+  +--rw sync
+     +--rw sync-config
+     |  +--rw sync-source?   synergy-sync-source <GNSS>
+     +--ro sync-status
+     |  +--ro sync-state                   enumeration
+     |  +--ro time-error?                  decimal64
+     |  +--ro frequency-error?             decimal64
+     |  +--ro supported-reference-types* [item]
+     |     +--ro item    synergy-sync-source
+     +--ro sync-capability
+     |  +--ro sync-t-tsc?   enumeration
+     +--rw ptp-config
+     |  +--rw domain-number?            uint8 <24>
+     |  +--rw accepted-clock-classes* [clock-classes]
+     |  |  +--rw clock-classes    uint8
+     |  +--rw ptp-profile?              enumeration <G_8275_1>
+     |  +--rw delay-asymmetry?          int16 <0>
+     |  +--rw g-8275-1-config
+     |  |  +--rw multicast-mac-address?   enumeration <FORWARDABLE>
+     |  |  x--rw delay-asymmetry?         int16 <0>
+     |  +--rw g-8275-2-config
+     |     +--rw local-ip-port?               -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
+     |     +--rw master-ip-configuration* [local-priority]
+     |     |  +--rw local-priority    uint8
+     |     |  +--rw ip-address?       string
+     |     +--rw log-inter-sync-period?       int8
+     |     +--rw log-inter-announce-period?   int8
+     +--rw ptp-status
+     |  +--rw reporting-period?           uint8 <10>
+     |  +--ro lock-state?                 enumeration
+     |  +--ro clock-class?                uint8
+     |  +--ro clock-identity?             string
+     |  +--ro partial-timing-supported?   boolean
+     |  +--ro sources* [local-port-number]
+     |     +--ro local-port-number             -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:port-reference/o-ran-interfaces:port-number
+     |     +--ro state?                        enumeration
+     |     +--ro two-step-flag?                boolean
+     |     +--ro leap61?                       boolean
+     |     +--ro leap59?                       boolean
+     |     +--ro current-utc-offset-valid?     boolean
+     |     +--ro ptp-timescale?                boolean
+     |     +--ro time-traceable?               boolean
+     |     +--ro frequency-traceable?          boolean
+     |     +--ro source-clock-identity?        string
+     |     +--ro source-port-number?           uint16
+     |     +--ro current-utc-offset?           int16
+     |     +--ro priority1?                    uint8
+     |     +--ro clock-class?                  uint8
+     |     +--ro clock-accuracy?               uint8
+     |     +--ro offset-scaled-log-variance?   uint16
+     |     +--ro priority2?                    uint8
+     |     +--ro grandmaster-clock-identity?   string
+     |     +--ro steps-removed?                uint16
+     |     +--ro time-source?                  uint8
+     +--rw synce-config
+     |  +--rw acceptance-list-of-ssm*   enumeration
+     |  +--rw ssm-timeout?              uint16
+     +--rw synce-status
+     |  +--rw reporting-period?   uint8 <10>
+     |  +--ro lock-state?         enumeration
+     |  +--ro sources* [local-port-number]
+     |     +--ro local-port-number    -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:port-reference/o-ran-interfaces:port-number
+     |     +--ro state?               enumeration
+     |     +--ro quality-level?       uint8
+     +--rw gnss-config {GNSS}?
+     |  +--rw enable?                        boolean
+     |  +--rw satellite-constelation-list*   enumeration
+     |  +--rw polarity?                      enumeration <POSITIVE>
+     |  +--rw cable-delay?                   uint16 <5>
+     |  +--rw anti-jam-enable?               boolean <false> {ANTI-JAM}?
+     +--rw gnss-status {GNSS}?
+        +--rw reporting-period?   uint8 <10>
+        +--ro name?               string
+        +--ro gnss-sync-status?   enumeration
+        +--ro gnss-data
+           +--ro satellites-tracked?   uint8
+           +--ro location
+           |  +--ro altitude?    int64
+           |  +--ro latitude?    geographic-coordinate-degree
+           |  +--ro longitude?   geographic-coordinate-degree
+           +--ro gnss-rx-time-error?   decimal64
+
+  notifications:
+    +---n synchronization-state-change
+    |  +--ro sync-state?   -> /sync/sync-status/sync-state
+    +---n ptp-state-change
+    |  +--ro ptp-state?   -> /sync/ptp-status/lock-state
+    +---n synce-state-change
+    |  +--ro synce-state?   -> /sync/synce-status/lock-state
+    +---n gnss-state-change {GNSS}?
+       +--ro gnss-state?   -> /sync/gnss-status/gnss-sync-status

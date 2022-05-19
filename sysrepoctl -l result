@@ -1,0 +1,56 @@
+root@o-ru:~# sysrepoctl -l
+Sysrepo repository: /opt/sysrepo/zcu111
+
+Module Name                  | Revision   | Flags | Owner     | Permissions | Submodules | Features                                                    
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+iana-crypt-hash              | 2014-08-06 | i     |           |             |            |                                                             
+iana-hardware                | 2018-03-13 | I     | root:root | 600         |            |                                                             
+iana-if-type                 | 2017-01-19 | I     | root:root | 600         |            |                                                             
+ietf-crypto-types            | 2019-07-02 | I     | root:root | 666         |            |                                                             
+ietf-datastores              | 2018-02-14 | I     | root:root | 664         |            |                                                             
+ietf-hardware                | 2018-03-13 | I     | root:root | 600         |            |                                                             
+ietf-inet-types              | 2013-07-15 | i     |           |             |            |                                                             
+ietf-interfaces              | 2018-02-20 | I     | root:root | 600         |            |                                                             
+ietf-ip                      | 2018-02-22 | I     | root:root | 600         |            |                                                             
+ietf-keystore                | 2019-07-02 | I     | root:root | 666         |            | keystore-supported                                          
+ietf-netconf                 | 2013-09-29 | I     | root:root | 666         |            | writable-running candidate rollback-on-error validate startup url xpath
+ietf-netconf-acm             | 2018-02-14 | I     | root:root | 666         |            |                                                             
+ietf-netconf-monitoring      | 2010-10-04 | I     | root:root | 666         |            |                                                             
+ietf-netconf-nmda            | 2019-01-07 | I     | root:root | 666         |            | origin with-defaults                                        
+ietf-netconf-notifications   | 2012-02-06 | I     | root:root | 664         |            |                                                             
+ietf-netconf-server          | 2019-07-02 | I     | root:root | 666         |            | ssh-listen tls-listen ssh-call-home tls-call-home           
+ietf-netconf-with-defaults   | 2011-06-01 | I     | root:root | 664         |            |                                                             
+ietf-origin                  | 2018-02-14 | I     | root:root | 664         |            |                                                             
+ietf-ssh-common              | 2019-07-02 | i     |           |             |            |                                                             
+ietf-ssh-server              | 2019-07-02 | I     | root:root | 666         |            | local-client-auth-supported                                 
+ietf-tcp-client              | 2019-07-02 | i     |           |             |            |                                                             
+ietf-tcp-common              | 2019-07-02 | I     | root:root | 666         |            | keepalives-supported                                        
+ietf-tcp-server              | 2019-07-02 | i     |           |             |            |                                                             
+ietf-tls-common              | 2019-07-02 | i     |           |             |            |                                                             
+ietf-tls-server              | 2019-07-02 | I     | root:root | 666         |            | local-client-auth-supported                                 
+ietf-truststore              | 2019-07-02 | I     | root:root | 666         |            | truststore-supported x509-certificates                      
+ietf-x509-cert-to-name       | 2014-12-10 | I     | root:root | 666         |            |                                                             
+ietf-yang-library            | 2019-01-04 | I     | root:root | 664         |            |                                                             
+ietf-yang-metadata           | 2016-08-05 | i     |           |             |            |                                                             
+ietf-yang-types              | 2013-07-15 | i     |           |             |            |                                                             
+nc-notifications             | 2008-07-14 | I     | root:root | 666         |            |                                                             
+notifications                | 2008-07-14 | I     | root:root | 666         |            |                                                             
+o-ran-compression-factors    | 2020-08-10 | I     | root:root | 600         |            | CONFIGURABLE-FS-OFFSET                                      
+o-ran-delay-management       | 2020-08-10 | I     | root:root | 600         |            | ADAPTIVE-RU-PROFILE                                         
+o-ran-file-management        | 2019-07-03 | I     | root:root | 600         |            |                                                             
+o-ran-fm                     | 2019-02-04 | I     | root:root | 600         |            |                                                             
+o-ran-hardware               | 2020-12-10 | I     | root:root | 600         |            |                                                             
+o-ran-interfaces             | 2020-12-10 | I     | root:root | 600         |            | ALIASMAC-BASED-CU-PLANE                                     
+o-ran-module-cap             | 2020-12-10 | I     | root:root | 600         |            | PRACH-STATIC-CONFIGURATION-SUPPORTED SRS-STATIC-CONFIGURATION-SUPPORTED CONFIGURABLE-TDD-PATTERN-SUPPORTED
+o-ran-operations             | 2020-12-10 | I     | root:root | 600         |            |                                                             
+o-ran-performance-management | 2020-12-10 | I     | root:root | 600         |            |                                                             
+o-ran-processing-element     | 2020-04-17 | I     | root:root | 600         |            |                                                             
+o-ran-software-management    | 2019-07-03 | I     | root:root | 600         |            |                                                             
+o-ran-supervision            | 2020-12-10 | I     | root:root | 600         |            |                                                             
+o-ran-sync                   | 2021-07-13 | I     | root:root | 600         |            | GNSS                                                        
+o-ran-troubleshooting        | 2019-02-04 | I     | root:root | 600         |            |                                                             
+o-ran-uplane-conf            | 2020-12-10 | I     | root:root | 600         |            | TX-REFERENCE-LEVEL                                          
+o-ran-wg4-features           | 2020-12-10 | I     | root:root | 600         |            |                                                             
+sysrepo-monitoring           | 2021-01-15 | I     | root:root | 600         |            |                                                             
+sysrepo-plugind              | 2020-12-10 | I     | root:root | 664         |            |                                                             
+yang                         | 2017-02-20 | I     | root:root | 664         |            |         

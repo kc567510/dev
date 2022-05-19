@@ -11,6 +11,39 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 About access control 20220504 update
 1.請教vincent ems端有沒有可以新增user或是group的方法，並且將他們設定權限
 2.針對3.4 NETCONF Access Control中的Module Rules tabel(p.28)建立一個excel表，列出目前可用之yang model的權限分別有哪些
