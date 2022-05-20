@@ -1,0 +1,20 @@
+20220510
+ifconfig eth0 down
+ifconfig eth0 up
+ {//當網路度斷掉時會出現下列訊息
+    [  325.654478] macb ff0e0000.ethernet eth0: DMA bus error: HRESP not OK 
+ }
+
+ 15:21
+   1. 將synKPI_shm_init()中之memset(shmKpi, 0, synkpi_size)註解 at synKPImain.c
+   2. 將synKPI_PiInit()中之memset(g_pSynKpiPi, 0, sizeof(S_SYNKPI_PI))註解 at synKPI_pi.c
+   3. 同時註解1與2之後可以順跑，網路不會斷，功能皆正常
+   4. 單1或單2註解後網路一樣會斷
+16:00
+   1. 嘗試先將網路線拔除，再啟動oam_agent，再接回網路線後依舊斷線
+   2. 發現結構的size太大，將近620MB
+ 17:00
+   1. 102branch 的也是一樣大 620MB 
+
+20220515
+   1. 澄清為memory損壞造成網路功能異常

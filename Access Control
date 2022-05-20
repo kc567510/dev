@@ -595,6 +595,7 @@
        $ passwd nms
        $ G#Staff6519321
 
+
 6. update setModuleRule.xml
     <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
         <enable-nacm>true</enable-nacm>
