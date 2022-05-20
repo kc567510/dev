@@ -16,8 +16,8 @@
     $ sysrepocfg -W usermgmt.xml --datastore startup --module o-ran-usermgmt -f xml -v 3
 }
 
-2. $ edit-config --target running --config=setGroups.xml
-{the content of setGroups.xml
+2. $ edit-config --target running --config=setGroup.xml
+{the content of setGroup.xml
     <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
         <groups>
             <group>
@@ -573,6 +573,7 @@
 4. According to the tree, check all settings are ok!
     $ get-config --source running --filter-xpath /o-ran-usermgmt:users/user
     $ get-config --source running --filter-xpath /ietf-netconf-acm:nacm/groups
+    $ get-config --source running --filter-xpath /o-ran-processing-element:processing-elements
     $ get-config --source running --filter-xpath /ietf-netconf-acm:nacm/rule-list
     $ get-config --source running --filter-xpath /o-ran-sync:sync/sync-config
 
@@ -594,157 +595,549 @@
        $ passwd nms
        $ G#Staff6519321
 
+6. update setModuleRule.xml
+    <nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+        <enable-nacm>true</enable-nacm>
+        <read-default>permit</read-default> 
+        <write-default>deny</write-default> 
+        <exec-default>deny</exec-default> 
+        
+        <rule-list>
+            <name>sudo-access</name>
+            <group>sudo</group>
+            <rule>
+                <name>permit-all</name>
+                <module-name>*</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the sudo group "R W X" access to all
+                    operations and data.
+                </comment>
+            </rule>
+        </rule-list>
 
-module: ietf-netconf-monitoring
-  +--ro netconf-state
-     +--ro capabilities
-     |  +--ro capability*   ietf-inet-types:uri
-     +--ro datastores
-     |  +--ro datastore* [name]
-     |     +--ro name     netconf-datastore-type
-     |     +--ro locks!
-     |        +--ro (lock-type)?
-     |           +--:(global-lock)
-     |           |  +--ro global-lock
-     |           |     +--ro locked-by-session    uint32
-     |           |     +--ro locked-time          ietf-yang-types:date-and-time
-     |           +--:(partial-lock)
-     |              +--ro partial-lock* [lock-id]
-     |                 +--ro lock-id              uint32
-     |                 +--ro locked-by-session    uint32
-     |                 +--ro locked-time          ietf-yang-types:date-and-time
-     |                 +--ro select*              ietf-yang-types:xpath1.0
-     |                 +--ro locked-node*         instance-identifier
-     +--ro schemas
-     |  +--ro schema* [identifier version format]
-     |     +--ro identifier    string
-     |     +--ro version       string
-     |     +--ro format        identityref
-     |     +--ro namespace     ietf-inet-types:uri
-     |     +--ro location*     union
-     +--ro sessions
-     |  +--ro session* [session-id]
-     |     +--ro session-id           uint32
-     |     +--ro transport            identityref
-     |     +--ro username             string
-     |     +--ro source-host?         ietf-inet-types:host
-     |     +--ro login-time           ietf-yang-types:date-and-time
-     |     +--ro in-rpcs?             ietf-yang-types:zero-based-counter32
-     |     +--ro in-bad-rpcs?         ietf-yang-types:zero-based-counter32
-     |     +--ro out-rpc-errors?      ietf-yang-types:zero-based-counter32
-     |     +--ro out-notifications?   ietf-yang-types:zero-based-counter32
-     +--ro statistics
-        +--ro netconf-start-time?   ietf-yang-types:date-and-time
-        +--ro in-bad-hellos?        ietf-yang-types:zero-based-counter32
-        +--ro in-sessions?          ietf-yang-types:zero-based-counter32
-        +--ro dropped-sessions?     ietf-yang-types:zero-based-counter32
-        +--ro in-rpcs?              ietf-yang-types:zero-based-counter32
-        +--ro in-bad-rpcs?          ietf-yang-types:zero-based-counter32
-        +--ro out-rpc-errors?       ietf-yang-types:zero-based-counter32
-        +--ro out-notifications?    ietf-yang-types:zero-based-counter32
+        <rule-list>
+            <name>nms-access</name>
+            <group>nms</group>
+            
+            
+            
+            <rule>
+                <name>o-ran-hardware-permission</name>
+                <module-name>o-ran-hardware</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to o-ran-hardware
+                    operations and data.
+                </comment>
+            </rule>
 
-  rpcs:
-    +---x get-schema
-       +---- input
-       |  +---w identifier    string
-       |  +---w version?      string
-       |  +---w format?       identityref
-       +---- output
-          +--ro data?   anyxml
+            <rule>
+                <name>ietf-hardware-permission</name>
+                <module-name>ietf-hardware</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to ietf-hardware
+                    operations and data.
+                </comment>
+            </rule>
 
+            <rule>
+                <name>iana-hardware-permission</name>
+                <module-name>iana-hardware</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to iana-hardware
+                    operations and data.
+                </comment>
+            </rule>
 
+            <rule>
+                <name>o-ran-fm-permission</name>
+                <module-name>o-ran-fm</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R X" access to oran-fm
+                    operations and data.
+                </comment>
+            </rule>
 
-module: o-ran-sync
-  +--rw sync
-     +--rw sync-config
-     |  +--rw sync-source?   synergy-sync-source <GNSS>
-     +--ro sync-status
-     |  +--ro sync-state                   enumeration
-     |  +--ro time-error?                  decimal64
-     |  +--ro frequency-error?             decimal64
-     |  +--ro supported-reference-types* [item]
-     |     +--ro item    synergy-sync-source
-     +--ro sync-capability
-     |  +--ro sync-t-tsc?   enumeration
-     +--rw ptp-config
-     |  +--rw domain-number?            uint8 <24>
-     |  +--rw accepted-clock-classes* [clock-classes]
-     |  |  +--rw clock-classes    uint8
-     |  +--rw ptp-profile?              enumeration <G_8275_1>
-     |  +--rw delay-asymmetry?          int16 <0>
-     |  +--rw g-8275-1-config
-     |  |  +--rw multicast-mac-address?   enumeration <FORWARDABLE>
-     |  |  x--rw delay-asymmetry?         int16 <0>
-     |  +--rw g-8275-2-config
-     |     +--rw local-ip-port?               -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
-     |     +--rw master-ip-configuration* [local-priority]
-     |     |  +--rw local-priority    uint8
-     |     |  +--rw ip-address?       string
-     |     +--rw log-inter-sync-period?       int8
-     |     +--rw log-inter-announce-period?   int8
-     +--rw ptp-status
-     |  +--rw reporting-period?           uint8 <10>
-     |  +--ro lock-state?                 enumeration
-     |  +--ro clock-class?                uint8
-     |  +--ro clock-identity?             string
-     |  +--ro partial-timing-supported?   boolean
-     |  +--ro sources* [local-port-number]
-     |     +--ro local-port-number             -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:port-reference/o-ran-interfaces:port-number
-     |     +--ro state?                        enumeration
-     |     +--ro two-step-flag?                boolean
-     |     +--ro leap61?                       boolean
-     |     +--ro leap59?                       boolean
-     |     +--ro current-utc-offset-valid?     boolean
-     |     +--ro ptp-timescale?                boolean
-     |     +--ro time-traceable?               boolean
-     |     +--ro frequency-traceable?          boolean
-     |     +--ro source-clock-identity?        string
-     |     +--ro source-port-number?           uint16
-     |     +--ro current-utc-offset?           int16
-     |     +--ro priority1?                    uint8
-     |     +--ro clock-class?                  uint8
-     |     +--ro clock-accuracy?               uint8
-     |     +--ro offset-scaled-log-variance?   uint16
-     |     +--ro priority2?                    uint8
-     |     +--ro grandmaster-clock-identity?   string
-     |     +--ro steps-removed?                uint16
-     |     +--ro time-source?                  uint8
-     +--rw synce-config
-     |  +--rw acceptance-list-of-ssm*   enumeration
-     |  +--rw ssm-timeout?              uint16
-     +--rw synce-status
-     |  +--rw reporting-period?   uint8 <10>
-     |  +--ro lock-state?         enumeration
-     |  +--ro sources* [local-port-number]
-     |     +--ro local-port-number    -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:port-reference/o-ran-interfaces:port-number
-     |     +--ro state?               enumeration
-     |     +--ro quality-level?       uint8
-     +--rw gnss-config {GNSS}?
-     |  +--rw enable?                        boolean
-     |  +--rw satellite-constelation-list*   enumeration
-     |  +--rw polarity?                      enumeration <POSITIVE>
-     |  +--rw cable-delay?                   uint16 <5>
-     |  +--rw anti-jam-enable?               boolean <false> {ANTI-JAM}?
-     +--rw gnss-status {GNSS}?
-        +--rw reporting-period?   uint8 <10>
-        +--ro name?               string
-        +--ro gnss-sync-status?   enumeration
-        +--ro gnss-data
-           +--ro satellites-tracked?   uint8
-           +--ro location
-           |  +--ro altitude?    int64
-           |  +--ro latitude?    geographic-coordinate-degree
-           |  +--ro longitude?   geographic-coordinate-degree
-           +--ro gnss-rx-time-error?   decimal64
+            <rule>
+                <name>o-ran-sync-permission</name>
+                <module-name>o-ran-sync</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to oran-sync
+                    operations and data.
+                </comment>
+            </rule>
 
-  notifications:
-    +---n synchronization-state-change
-    |  +--ro sync-state?   -> /sync/sync-status/sync-state
-    +---n ptp-state-change
-    |  +--ro ptp-state?   -> /sync/ptp-status/lock-state
-    +---n synce-state-change
-    |  +--ro synce-state?   -> /sync/synce-status/lock-state
-    +---n gnss-state-change {GNSS}?
-       +--ro gnss-state?   -> /sync/gnss-status/gnss-sync-status
+            <rule>
+                <name>o-ran-module-cap-permission</name>
+                <module-name>o-ran-module-cap</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R" access to oran-module-cap
+                    operations and data.
+                </comment>
+            </rule>
 
+            <rule>
+                <name>o-ran-operations-permission</name>
+                <module-name>o-ran-operations</module-name>
+                <access-operations>read create update delete</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W" access to oran-operations
+                    operations and data.
+                </comment>
+            </rule>
 
+            <rule>
+                <name>o-ran-uplane-conf-permission</name>
+                <module-name>o-ran-uplane-conf</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to oran-uplane-conf
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-software-management-permission</name>
+                <module-name>o-ran-software-management</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R X" access to oran-software-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-file-management-permission</name>
+                <module-name>o-ran-file-management</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "X" access to oran-file-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-performance-management-permission</name>
+                <module-name>o-ran-performance-management</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to oran-performance-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-interfaces-permission</name>
+                <module-name>o-ran-interfaces</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W X" access to oran-interfaces
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-ip-permission</name>
+                <module-name>ietf-ip</module-name>
+                <access-operations>read create update delete</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W" access to ietf-ip
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-interfaces-permission</name>
+                <module-name>ietf-interfaces</module-name>
+                <access-operations>read create update delete</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W" access to ietf-interfaces
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-processing-element-permission</name>
+                <module-name>o-ran-processing-element</module-name>
+                <access-operations>read create update delete</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R W" access to oran-processing-element
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-troubleshooting-permission</name>
+                <module-name>o-ran-troubleshooting</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "X" access to oran-troubleshooting
+                    operations and data.
+                </comment>
+            </rule>
+            
+            <rule>
+                <name>ietf-netconf-acm-permission</name>
+                <module-name>ietf-netconf-acm</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R" access to ietf-netconf-acm
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-yang-library-permission</name>
+                <module-name>ietf-yang-library</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R X" access to ietf-yang-library
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-monitoring-permission</name>
+                <module-name>ietf-netconf-monitoring</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "R X" access to ietf-netconf-monitoring
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-notifications-permission</name>
+                <module-name>ietf-netconf-notifications</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the nms group "X" access to ietf-netconf-notifications
+                    operations and data.
+                </comment>
+            </rule>
+        </rule-list>
+  
+        <rule-list>
+            <name>fm-pm-access</name>
+            <group>fm-pm</group>
+          
+
+            <rule>
+                <name>ietf-hardware-permission</name>
+                <module-name>ietf-hardware</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R X" access to ietf-hardware
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>iana-hardware-permission</name>
+                <module-name>iana-hardware</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R X" access to iana-hardware
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-fm-permission</name>
+                <module-name>o-ran-fm</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R X" access to oran-fm
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-sync-permission</name>
+                <module-name>o-ran-sync</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-sync
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-module-cap-permission</name>
+                <module-name>o-ran-module-cap</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-module-cap
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-operations-permission</name>
+                <module-name>o-ran-operations</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-operations
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-uplane-conf-permission</name>
+                <module-name>o-ran-uplane-conf</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-uplane-conf
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-software-management-permission</name>
+                <module-name>o-ran-software-management</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-software-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-file-management-permission</name>
+                <module-name>o-ran-file-management</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "X" access to oran-file-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-performance-management-permission</name>
+                <module-name>o-ran-performance-management</module-name>
+                <access-operations>*</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R W X" access to oran-performance-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-interfaces-permission</name>
+                <module-name>o-ran-interfaces</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-interfaces
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-ip-permission</name>
+                <module-name>ietf-ip</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to ietf-ip
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-interfaces-permission</name>
+                <module-name>ietf-interfaces</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to ietf-interfaces
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-processing-element-permission</name>
+                <module-name>o-ran-processing-element</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to oran-processing-element
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>o-ran-troubleshooting-permission</name>
+                <module-name>o-ran-troubleshooting</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "X" access to oran-troubleshooting
+                    operations and data.
+                </comment>
+            </rule>
+            
+            <rule>
+                <name>ietf-netconf-acm-permission</name>
+                <module-name>ietf-netconf-acm</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R" access to ietf-netconf-acm
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-yang-library-permission</name>
+                <module-name>ietf-yang-library</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R X" access to ietf-yang-library
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-monitoring-permission</name>
+                <module-name>ietf-netconf-monitoring</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "R X" access to ietf-netconf-monitoring
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-notifications-permission</name>
+                <module-name>ietf-netconf-notifications</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the fm-pm group "X" access to ietf-netconf-notifications
+                    operations and data.
+                </comment>
+            </rule>
+        </rule-list>
+
+        <rule-list>
+            <name>swm-access</name>
+            <group>swm</group>
+            
+            <rule>
+	        <name>o-ran-sync-permission</name>
+                <module-name>o-ran-sync</module-name>
+                <access-operations>*</access-operations>
+                <action>deny</action>
+                <comment>
+                    Deny the swm group access to o-ran-sync
+                    operations and data.
+                </comment>
+	    </rule>
+	    
+	    <rule>
+	        <name>ietf-netconf-permission</name>
+                <module-name>ietf-netconf</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the swm group "R X" access to ietf-netconf
+                    operations and data.
+                </comment>
+	    </rule>
+	    
+            <rule>
+                <name>o-ran-software-management-permission</name>
+                <module-name>o-ran-software-management</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the swm group "R X" access to o-ran-software-management
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-acm-permission</name>
+                <module-name>ietf-netconf-acm</module-name>
+                <access-operations>read</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the swm group "R" access to ietf-netconf-acm
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-yang-library-permission</name>
+                <module-name>ietf-yang-library</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the swm group "R X" access to ietf-yang-library
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-monitoring-permission</name>
+                <module-name>ietf-netconf-monitoring</module-name>
+                <access-operations>read exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the swm group "R X" access to ietf-netconf-monitoring
+                    operations and data.
+                </comment>
+            </rule>
+
+            <rule>
+                <name>ietf-netconf-notifications-permission</name>
+                <module-name>ietf-netconf-notifications</module-name>
+                <access-operations>exec</access-operations>
+                <action>permit</action>
+                <comment>
+                    Allow the swm group "X" access to ietf-netconf-notifications
+                    operations and data.
+                </comment>
+            </rule>
+        </rule-list>
+    </nacm>

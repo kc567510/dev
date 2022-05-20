@@ -197,3 +197,51 @@ module: o-ran-sync
     |  +--ro synce-state?   -> /sync/synce-status/lock-state
     +---n gnss-state-change {GNSS}?
        +--ro gnss-state?   -> /sync/gnss-status/gnss-sync-status
+
+
+
+
+module: o-ran-processing-element
+  +--rw processing-elements
+     +--ro maximum-number-of-transport-flows?   uint16 <4094>
+     +--rw transport-session-type?              enumeration <ETH-INTERFACE>
+     +--rw enhanced-uplane-mapping!
+     |  +--rw uplane-mapping* [up-marking-name]
+     |     +--rw up-marking-name    string
+     |     +--rw (up-markings)?
+     |        +--:(ethernet)
+     |        |  +--rw up-cos-name?   -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:class-of-service/o-ran-interfaces:enhanced-uplane-markings/o-ran-interfaces:up-marking-name
+     |        +--:(ipv4)
+     |        |  +--rw upv4-dscp-name?   -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-ip:ipv4/o-ran-interfaces:diffserv-markings/o-ran-interfaces:enhanced-uplane-markings/o-ran-interfaces:up-marking-name
+     |        +--:(ipv6)
+     |           +--rw upv6-dscp-name?   -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-ip:ipv6/o-ran-interfaces:diffserv-markings/o-ran-interfaces:enhanced-uplane-markings/o-ran-interfaces:up-marking-name
+     +--rw ru-elements* [name]
+        +--rw name              string
+        +--rw transport-flow
+           +--rw interface-name?   -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
+           +--rw aliasmac-flow {o-ran-interfaces:ALIASMAC-BASED-CU-PLANE}?
+           |  +--rw ru-aliasmac-address    -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:alias-macs
+           |  +--rw vlan-id?               -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:vlan-id
+           |  +--rw o-du-mac-address       ietf-yang-types:mac-address
+           +--rw eth-flow
+           |  +--rw ru-mac-address      -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:mac-address
+           |  +--rw vlan-id             -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:vlan-id
+           |  +--rw o-du-mac-address    ietf-yang-types:mac-address
+           +--rw udpip-flow
+           |  +--rw (address)
+           |  |  +--:(ru-ipv4-address)
+           |  |  |  +--rw ru-ipv4-address?   -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/ietf-ip:ipv4/ietf-ip:address/ietf-ip:ip
+           |  |  +--:(ru-ipv6-address)
+           |  |     +--rw ru-ipv6-address?   -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/ietf-ip:ipv6/ietf-ip:address/ietf-ip:ip
+           |  +--rw o-du-ip-address            ietf-inet-types:ip-address
+           |  +--rw ru-ephemeral-udp-port      ietf-inet-types:port-number
+           |  +--rw o-du-ephemeral-udp-port    ietf-inet-types:port-number
+           |  +--rw ecpri-destination-udp      ietf-inet-types:port-number
+           +--rw north-eth-flow {SHARED_CELL}?
+           |  +--rw ru-mac-address?           -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:mac-address
+           |  +--rw vlan-id?                  -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:vlan-id
+           |  +--rw north-node-mac-address?   ietf-yang-types:mac-address
+           +--rw south-eth-flow {SHARED_CELL}?
+              +--rw ru-mac-address?           -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:mac-address
+              +--rw vlan-id?                  -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:vlan-id
+              +--rw south-node-mac-address?   ietf-yang-types:mac-address
