@@ -1,0 +1,68 @@
+set dhcpsrv
+    1. download dhcpsrv2.5.2 and open it
+    2. choose enable network interface cards and click next (if need, can click refresh)
+    3. at supported protocols page, jush click next
+    4. at configuring dhcp for interface page, go to dhcp option
+    5. at dhcp option page, add option number and option string, for ex: 43 and 123456789, and click next
+    6. at writing INI file page, choose overwrite existing file and click write INI file, then click next
+    7. at dhcp configuration completed page, click admin...
+    8. at dhcp server window, service -> install -> start, firewall exceptions -> configure
+
+in dhclient-script file
+    1. add env at bound and save 
+    2. client can command $ dhclient -sf dhclient-script eth0
+
+
+output
+{
+    169.254.0.1
+    requested_domain_name_servers=1
+    requested_broadcast_address=1
+    new_network_number=169.254.0.0
+    new_ip_address=169.254.0.1
+    BASH_XTRACEFD=
+    requested_domain_search=1
+    new_dhcp_message_type=5
+    pid=6387
+    old_dhcp_lease_time=86400
+    new_server_name=DESKTOP-LLNVKUU
+    requested_netbios_name_servers=1
+    old_network_number=169.254.0.0
+    old_ip_address=169.254.0.1
+    old_dhcp_message_type=5
+    GLOBIGNORE=
+    new_routers=0.0.0.0
+    new_expiry=1653730746
+    new_subnet_mask=255.255.0.0
+    old_server_name=DESKTOP-LLNVKUU
+    ENV=
+****new_vendor_encapsulated_options=12:34:56:78:9
+    interface=eth0
+    requested_ntp_servers=1
+    requested_time_offset=1
+    old_routers=0.0.0.0
+    reason=BOUND
+    old_expiry=1653644334
+    old_subnet_mask=255.255.0.0
+    old_vendor_encapsulated_options=a9:fe:0:1
+    requested_routers=1
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    requested_subnet_mask=1
+    requested_domain_name=1
+    new_netbios_node_type=8
+    CDPATH=
+    new_dhcp_server_identifier=169.254.0.2
+    requested_interface_mtu=1
+    requested_rfc3442_classless_static_routes=1
+    new_broadcast_address=169.254.255.255
+    old_netbios_node_type=8
+    old_dhcp_server_identifier=169.254.0.2
+    BASH_ENV=
+    requested_host_name=1
+    PWD=/sbin
+    requested_netbios_scope=1
+    old_broadcast_address=169.254.255.255
+    new_next_server=169.254.0.2
+    new_dhcp_lease_time=86400
+}
+

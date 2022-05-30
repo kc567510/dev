@@ -1,12 +1,33 @@
 0. create a xml file named usermgmt.xml in the same folder with o-ran-usermgmt.yang
 {the content of usermgmt.xml
     <users xmlns="urn:o-ran:user-mgmt:1.0">
-      <user>
-        <name>root</name>
-        <account-type>PASSWORD</account-type>
-        <password>12345678</password>
-        <enabled>true</enabled>
-      </user>
+        <user>
+            <name>root</name>
+            <account-type>PASSWORD</account-type>
+            <password>12345678</password>
+            <enabled>true</enabled>
+        </user>
+  
+        <user>
+            <name>liteon</name>
+            <account-type>PASSWORD</account-type>
+            <password>12345678</password>
+            <enabled>true</enabled>
+         </user>
+  
+        <user>
+            <name>nms</name>
+            <account-type>PASSWORD</account-type>
+            <password>12345678</password>
+            <enabled>true</enabled>
+        </user>
+  
+        <user>
+            <name>fmpm</name>
+            <account-type>PASSWORD</account-type>
+            <password>12345678</password>
+            <enabled>true</enabled>
+        </user>
     </users>
 }
 
