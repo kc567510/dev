@@ -6,8 +6,11 @@
     netopeer2-server -d -v 2    //server端執行netopeer2-server
     netopeer2-server -d -v 2 &  //可開啟netopeer2-server並在前台執行
 
-    #Call-Home procedure from server
+    #Call-Home procedure setting from server
         sysrepocfg --import=ssh_callhome.xml --format=xml --datastore=running --module=ietf-netconf-server
+
+
+sysrepocfg --export --xpath /ietf-netconf-server:netconf-server/listen/endpoint/name
 
 
 #VM Client端
@@ -517,3 +520,4 @@ module: ietf-netconf-acm
 
 get-config --source running --filter-xpath /ietf-netconf-acm:nacm/groups
 get-config --source running --filter-xpath /o-ran-usermgmt:users/user/name
+

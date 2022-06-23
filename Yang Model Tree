@@ -245,3 +245,63 @@ module: o-ran-processing-element
               +--rw ru-mac-address?           -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:mac-address
               +--rw vlan-id?                  -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../../interface-name]/o-ran-interfaces:vlan-id
               +--rw south-node-mac-address?   ietf-yang-types:mac-address
+
+
+module: o-ran-interfaces
+
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface:
+    +--rw l2-mtu?                uint16 <1500>
+    +--rw vlan-tagging?          boolean <true>
+    +--rw class-of-service
+    |  +--rw u-plane-marking?            pcp <7>
+    |  +--rw c-plane-marking?            pcp <7>
+    |  +--rw m-plane-marking?            pcp <2>
+    |  +--rw s-plane-marking?            pcp <7>
+    |  +--rw other-marking?              pcp <1>
+    |  +--rw enhanced-uplane-markings* [up-marking-name]
+    |     +--rw up-marking-name     string
+    |     +--rw enhanced-marking?   pcp
+    +--ro interface-groups-id*   -> /ietf-interfaces:interfaces/o-ran-interfaces:interface-grouping/o-ran-interfaces:interfaces-groups/o-ran-interfaces:interface-group-id
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface:
+    +--rw base-interface?   ietf-interfaces:interface-ref
+    +--rw vlan-id?          uint16
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface:
+    +--ro last-cleared?   ietf-yang-types:date-and-time
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-ip:ipv4:
+    +--rw m-plane-marking?   ietf-inet-types:dscp <18>
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-ip:ipv6:
+    +--rw m-plane-marking?   ietf-inet-types:dscp <18>
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface:
+    +--rw alias-macs*   ietf-yang-types:mac-address {ALIASMAC-BASED-CU-PLANE}?
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface:
+    +--rw mac-address?      ietf-yang-types:mac-address
+    +--rw port-reference
+       +--rw port-name?     -> /ietf-hardware:hardware/ietf-hardware:component/ietf-hardware:name
+       +--rw port-number?   uint8
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-ip:ipv4:
+    +--rw diffserv-markings
+       +--rw u-plane-marking?            ietf-inet-types:dscp <46>
+       +--rw c-plane-marking?            ietf-inet-types:dscp <46>
+       +--rw s-plane-marking?            ietf-inet-types:dscp <46>
+       +--rw other-marking?              ietf-inet-types:dscp <0>
+       +--rw enhanced-uplane-markings* [up-marking-name]
+          +--rw up-marking-name     string
+          +--rw enhanced-marking?   ietf-inet-types:dscp
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-ip:ipv6:
+    +--rw diffserv-markings
+       +--rw u-plane-marking?            ietf-inet-types:dscp <46>
+       +--rw c-plane-marking?            ietf-inet-types:dscp <46>
+       +--rw s-plane-marking?            ietf-inet-types:dscp <46>
+       +--rw other-marking?              ietf-inet-types:dscp <0>
+       +--rw enhanced-uplane-markings* [up-marking-name]
+          +--rw up-marking-name     string
+          +--rw enhanced-marking?   ietf-inet-types:dscp
+  augment /ietf-interfaces:interfaces:
+    +--ro interface-grouping!
+       +--ro interfaces-groups* [interface-group-id]
+          +--ro interface-group-id                   uint8
+          +--ro max-sustainable-ingress-bandwidth?   uint32
+          +--ro max-sustainable-egress-bandwidth?    uint32
+
+  rpcs:
+    +---x reset-interface-counters

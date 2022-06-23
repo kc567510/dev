@@ -10,3 +10,6 @@ git status
 git log --oneline //看之前上傳的checksum '384ddd4'
 git reset --hard 384ddd4 //回到版本384ddd4，切記回到之前版本別用 git push -f，會讓遠端的資料庫也被返回 這樣就無法再回來到最新的版本了
 ./go.oru make vranstack 
+
+
+ git reset --hard HEAD~~

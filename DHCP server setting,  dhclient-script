@@ -1,3 +1,5 @@
+https://blog.csdn.net/zj_888888/article/details/107486637
+https://www.dhcpserver.de/cms/download/
 set dhcpsrv
     1. download dhcpsrv2.5.2 and open it
     2. choose enable network interface cards and click next (if need, can click refresh)
@@ -106,3 +108,21 @@ $ dhclient -r eth0
 
 /var/lib/dhcp/dhclient.lease
 /etc/dhcp/dhclient.conf
+
+
+
+        echo $new_ip_address
+
+        env | grep new_vendor_encapsulated_options
+        option43=$( env | grep new_vendor_encapsulated_options)
+        #sed -i '8i '$option43'' /etc/config/general/sysini
+
+        #option43="new_vendor_encapsulated_options=172.19.205.123" #for test
+        option43_string=$(echo $option43 | cut -d"=" -f 1)
+        option43_value=$(echo $option43 | cut -d"=" -f 2)
+
+        echo $option43
+        echo $option43_string
+        echo $option43_value
+
+        sed -i '8i\        option '\'''$option43_string''\'' '\'''$option43_value''\''' /etc/config/general/sysini
