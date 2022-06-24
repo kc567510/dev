@@ -305,3 +305,58 @@ module: o-ran-interfaces
 
   rpcs:
     +---x reset-interface-counters
+
+
+module: o-ran-lbm
+  +--rw md-data-definitions
+     +--rw maintenance-domain* [id]
+        +--rw id                         string
+        +--rw name?                      string
+        +--rw md-level?                  md-level-type <0>
+        +--rw maintenance-association* [id]
+           +--rw id                string
+           +--rw name?             string
+           +--rw component-list* [component-id]
+              +--rw component-id                         uint32
+              +--rw name?                                string
+              +--rw vid*                                 -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:vlan-id
+              +--rw remote-meps*                         mep-id-type
+              +--rw maintenance-association-end-point* [mep-identifier]
+                 +--rw mep-identifier          mep-id-type
+                 +--rw interface               -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
+                 +--rw primary-vid             -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:vlan-id
+                 +--rw administrative-state    boolean
+                 +--ro mac-address?            -> /ietf-interfaces:interfaces/ietf-interfaces:interface/o-ran-interfaces:mac-address
+                 +--ro loopback
+                    +--ro replies-transmitted    ietf-yang-types:counter32
+
+module: o-ran-mplane-int
+  +--rw mplane-info
+     +--rw searchable-mplane-access-vlans-info
+     |  +--rw searchable-access-vlans*   vlan-id
+     |  +--rw vlan-range
+     |     +--rw lowest-vlan-id?    vlan-id
+     |     +--rw highest-vlan-id?   vlan-id
+     +--rw m-plane-interfaces
+     |  +--rw m-plane-sub-interfaces* [interface-name sub-interface]
+     |  |  +--rw interface-name    -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
+     |  |  +--rw sub-interface     -> /ietf-interfaces:interfaces/ietf-interfaces:interface[ietf-interfaces:name = current()/../interface-name]/o-ran-interfaces:vlan-id
+     |  |  +--ro client-info
+     |  |     +--ro mplane-ipv4-info* [mplane-ipv4]
+     |  |     |  +--ro mplane-ipv4    ietf-inet-types:ipv4-address
+     |  |     |  +--ro port?          ietf-inet-types:port-number
+     |  |     +--ro mplane-ipv6-info* [mplane-ipv6]
+     |  |     |  +--ro mplane-ipv6    ietf-inet-types:ipv6-address
+     |  |     |  +--ro port?          ietf-inet-types:port-number
+     |  |     +--ro mplane-fqdn*        ietf-inet-types:domain-name
+     |  +--rw m-plane-ssh-ports
+     |     +--rw call-home-ssh-port?   ietf-inet-types:port-number <4334>
+     |     +--rw server-ssh-port?      ietf-inet-types:port-number <830>
+     +--rw configured-client-info
+        +--rw mplane-ipv4-info* [mplane-ipv4]
+        |  +--rw mplane-ipv4    ietf-inet-types:ipv4-address
+        |  +--rw port?          ietf-inet-types:port-number
+        +--rw mplane-ipv6-info* [mplane-ipv6]
+        |  +--rw mplane-ipv6    ietf-inet-types:ipv6-address
+        |  +--rw port?          ietf-inet-types:port-number
+        +--rw mplane-fqdn*        ietf-inet-types:domain-name
