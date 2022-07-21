@@ -1,6 +1,6 @@
 如果要在server端使用ftpget or ftpput，格式如下: (使用之前需先設定 3CDaemon)
 
-ftpget -u [帳戶名稱] -p [密碼] [本機IP] [欲上傳至遠端的檔案] 
+ftpget -u [帳戶名稱] -p [密碼] [本機IP] [欲上傳至遠端(板子)的檔案] 
 
 ftpget -u cisco -p 123456 172.19.205.188 test.txt
 

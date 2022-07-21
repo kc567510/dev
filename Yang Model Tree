@@ -360,3 +360,76 @@ module: o-ran-mplane-int
         |  +--rw mplane-ipv6    ietf-inet-types:ipv6-address
         |  +--rw port?          ietf-inet-types:port-number
         +--rw mplane-fqdn*        ietf-inet-types:domain-name
+
+
+
+module: ietf-ip
+
+  augment /ietf-interfaces:interfaces/ietf-interfaces:interface:
+    +--rw ipv4!
+    |  +--rw enabled?      boolean <true>
+    |  +--rw forwarding?   boolean <false>
+    |  +--rw mtu?          uint16
+    |  +--rw address* [ip]
+    |  |  +--rw ip         ietf-inet-types:ipv4-address-no-zone
+    |  |  +--rw (subnet)
+    |  |  |  +--:(prefix-length)
+    |  |  |  |  +--rw prefix-length?   uint8
+    |  |  |  +--:(netmask)
+    |  |  |     +--rw netmask?   ietf-yang-types:dotted-quad {ipv4-non-contiguous-netmasks}?
+    |  |  +--ro origin?    ip-address-origin
+    |  +--rw neighbor* [ip]
+    |     +--rw ip                    ietf-inet-types:ipv4-address-no-zone
+    |     +--rw link-layer-address    ietf-yang-types:phys-address
+    |     +--ro origin?               neighbor-origin
+    +--rw ipv6!
+       +--rw enabled?                     boolean <true>
+       +--rw forwarding?                  boolean <false>
+       +--rw mtu?                         uint32
+       +--rw address* [ip]
+       |  +--rw ip               ietf-inet-types:ipv6-address-no-zone
+       |  +--rw prefix-length    uint8
+       |  +--ro origin?          ip-address-origin
+       |  +--ro status?          enumeration
+       +--rw neighbor* [ip]
+       |  +--rw ip                    ietf-inet-types:ipv6-address-no-zone
+       |  +--rw link-layer-address    ietf-yang-types:phys-address
+       |  +--ro origin?               neighbor-origin
+       |  +--ro is-router?            empty
+       |  +--ro state?                enumeration
+       +--rw dup-addr-detect-transmits?   uint32 <1>
+       +--rw autoconf
+          +--rw create-global-addresses?        boolean <true>
+          +--rw create-temporary-addresses?     boolean <false> {ipv6-privacy-autoconf}?
+          +--rw temporary-valid-lifetime?       uint32 <604800> {ipv6-privacy-autoconf}?
+          +--rw temporary-preferred-lifetime?   uint32 <86400> {ipv6-privacy-autoconf}?
+  augment /ietf-interfaces:interfaces-state/ietf-interfaces:interface:
+    x--ro ipv4!
+    |  x--ro forwarding?   boolean
+    |  x--ro mtu?          uint16
+    |  x--ro address* [ip]
+    |  |  x--ro ip          ietf-inet-types:ipv4-address-no-zone
+    |  |  x--ro (subnet)?
+    |  |  |  +--:(prefix-length)
+    |  |  |  |  x--ro prefix-length?   uint8
+    |  |  |  +--:(netmask)
+    |  |  |     x--ro netmask?   ietf-yang-types:dotted-quad {ipv4-non-contiguous-netmasks}?
+    |  |  x--ro origin?     ip-address-origin
+    |  x--ro neighbor* [ip]
+    |     x--ro ip                    ietf-inet-types:ipv4-address-no-zone
+    |     x--ro link-layer-address?   ietf-yang-types:phys-address
+    |     x--ro origin?               neighbor-origin
+    x--ro ipv6!
+       x--ro forwarding?   boolean <false>
+       x--ro mtu?          uint32
+       x--ro address* [ip]
+       |  x--ro ip               ietf-inet-types:ipv6-address-no-zone
+       |  x--ro prefix-length    uint8
+       |  x--ro origin?          ip-address-origin
+       |  x--ro status?          enumeration
+       x--ro neighbor* [ip]
+          x--ro ip                    ietf-inet-types:ipv6-address-no-zone
+          x--ro link-layer-address?   ietf-yang-types:phys-address
+          x--ro origin?               neighbor-origin
+          x--ro is-router?            empty
+          x--ro state?                enumeration

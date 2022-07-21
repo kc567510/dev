@@ -3,3 +3,4 @@ tar -cvf testFolder.tar testFolder      //製作.tar壓縮檔
 tar -zcvf testFolder.tar.gz testFolder  //製作.tar.gz壓縮檔
 
 tar zxvf test.tar.gz //解壓縮壓縮檔
+unzip test.zip
