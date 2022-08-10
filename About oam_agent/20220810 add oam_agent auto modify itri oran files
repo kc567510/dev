@@ -44,71 +44,119 @@ static int change_oran_uplane_conf_cb(sr_session_ctx_t *session, const char *mod
 					//end by kevin.chen
    ...
    ...
-                    //add by kevin.chen at 20220808 for automatically modify itri /opt/oran/yang files
+                    //add by kevin.chen at 20220810 for automatically modify itri /opt/oran/yang files
+					if( new_val->data.string_val!=NULL && strstr(new_val->data.string_val,"KHZ") && strstr(new_val->xpath, "low-level-tx-endpoints") ){ //for scs value
+						char* str = (char *)calloc(10, sizeof(char));
+						strcpy(str, new_val->data.string_val);
+						
+						int val = -1; //initial value
+						if( !strcmp(str, "KHZ_15") )//reference to o-ran-module-cap.yang line 150.
+							val = 0;
+						else if( !strcmp(str, "KHZ_30") )
+							val = 1;
+						else if( !strcmp(str, "KHZ_60") )
+							val = 2;
+						else if( !strcmp(str, "KHZ_120") )
+							val = 3;
+						else if( !strcmp(str, "KHZ_240") )
+							val = 4;
+						else if( !strcmp(str, "KHZ_1_25") )
+							val = 12;
+						else if( !strcmp(str, "KHZ_3_75") )
+							val = 13;
+						else if( !strcmp(str, "KHZ_5") )
+							val = 14;
+						else if( !strcmp(str, "KHZ_7_5") )
+							val = 15;
+										
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/low-level-tx-endpoints_name__itri-low-level-tx-endpoints__/number-of-prb-per-scs_scs__KHZ_30__/scs","w");
+						if( file==NULL ){
+							printf("open file scs fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write str: %s->val: %d to the scs file\n", str, val);
+						}
+						fclose(file);
+						free(str);
+					}
+					//end by kevin.chen
+                    sr_free_val(new_val);
+                    break;
+				
+                case SR_OP_MODIFIED:
+                    printf("[ SR_OP_MODIFIED ]\n");
+                    printf("%s =\n", new_val->xpath);
+                    printf("old = ");
+                    cdb_print_val(old_val);
+                    printf("\nnew = ");
+                    cdb_print_val(new_val);
+                    printf("\n");
+                    //oam_agent::oam_agent_hdlr::get_instance()->dynamic_cfg_read(XPATH_ORAN_UPLANE_CONF, action, op, new_val);
+					
+					//add by kevin.chen at 20220808 for automatically modify itri /opt/oran/yang files
 					if( strstr(new_val->xpath,"absolute-frequency-center") && strstr(new_val->xpath, "tx-array-carriers") ){ //for absolute-frequency-center value
-						int val = (int)new_val->data.uint32_val;
+						uint32_t val = new_val->data.uint32_val;
 						
 						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/tx-array-carriers_name__itri-tx-array-carriers__/absolute-frequency-center","w");
 						if( file==NULL ){
 							printf("open file absolute-frequency-center fail\n");
 						}
 						else{
-							fprintf(file, "%d\n", val); //write file
-							printf("write val: %d to the absolute-frequency-center  file\n",val);
+							fprintf(file, "%u\n", val); //write file
+							printf("write val: %u to the absolute-frequency-center  file\n", val);
 						}
 						fclose(file);
 					}
 					else if( !strstr(new_val->xpath,"center-of-channel-bandwidth") && strstr(new_val->xpath,"channel-bandwidth") && strstr(new_val->xpath, "tx-array-carriers") ){ //for channel-bandwidth value but not center-of-channel-bandwidth
-						int val = (int)new_val->data.uint64_val;
+						uint64_t val = new_val->data.uint64_val;
 						
 						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/tx-array-carriers_name__itri-tx-array-carriers__/channel-bandwidth","w");
 						if( file==NULL ){
 							printf("open file channel-bandwidth fail\n");
 						}
 						else{
-							fprintf(file, "%d\n", val); //write file
-							printf("write val: %d to the channel-bandwidth  file\n",val);
+							fprintf(file, "%lu\n", val); //write file
+							printf("write val: %lu to the channel-bandwidth  file\n",val);
 						}
 						fclose(file);
 					}
 					else if( strstr(new_val->xpath,"bitwidth") && strstr(new_val->xpath, "low-level-tx-endpoints") ){ //for compression bits value
-						int val = (int)new_val->data.uint8_val;
+						uint8_t val = new_val->data.uint8_val;
 						
 						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/low-level-tx-endpoints_name__itri-low-level-tx-endpoints__/compression/bitwidth","w");
 						if( file==NULL ){
 							printf("open file compression/bitwidth fail\n");
 						}
 						else{
-							fprintf(file, "%d\n", val); //write file
-							printf("write val: %d to the compression/bitwidth  file\n",val);
+							fprintf(file, "%hu\n", val); //write file
+							printf("write val: %hu to the compression/bitwidth  file\n", val);
 						}
 						fclose(file);
 					}
 					else if( strstr(new_val->xpath,"gain") && strstr(new_val->xpath, "tx-array-carriers") ){ //for tx-gain value
-						//printf("found substring 'gain' in %s\n", new_val->xpath);
-						//printf("new gain value: %g\n", new_val->data.decimal64_val);
-						int val = (int)new_val->data.decimal64_val;
+						double val = new_val->data.decimal64_val;
 						
 						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/tx-array-carriers_name__itri-tx-array-carriers__/gain","w");
 						if( file==NULL ){
 							printf("open file tx-gain fail\n");
 						}
 						else{
-							fprintf(file, "%d\n", val); //write file
-							printf("write val: %d to the gain file\n",val);
+							fprintf(file, "%g\n", val); //write file
+							printf("write val: %g to the gain file\n", val);
 						}
 						fclose(file);
 					}
 					else if( strstr(new_val->xpath,"gain-correction") && strstr(new_val->xpath, "rx-array-carriers") ){ //for rx-gain-correction value
-						int val = (int)new_val->data.decimal64_val;
+						double val = new_val->data.decimal64_val;
 						
 						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/rx-array-carriers_name__itri-rx-array-carriers__/gain-correction","w");
 						if( file==NULL ){
 							printf("open file rx-gain fail\n");
 						}
 						else{
-							fprintf(file, "%d\n", val); //write file
-							printf("write val: %d to the gain-correction file\n",val);
+							fprintf(file, "%g\n", val); //write file
+							printf("write val: %g to the gain-correction file\n", val);
 						}
 						fclose(file);
 					}
@@ -239,4 +287,16 @@ static int change_oran_process_elem_cb(sr_session_ctx_t *session, const char *mo
 	  //end by kevin.chen
 }
 
+
+//some test commands
+connect --ssh --host 172.19.77.88 --port 830 --login root
+subscribe
+
+edit-config --target running  --config=setItriProcessing.xml
+edit-config --target running  --config=setItriUplaneConf.xml
+
+get-config --source running --filter-xpath /ietf-interfaces:interfaces/interface
+get-config --source running --filter-xpath /o-ran-processing-element:processing-elements/ru-elements
+
+get-config --source running --filter-xpath /o-ran-uplane-conf:user-plane-configuration/low-level-tx-endpoints/number-of-prb-per-scs
 
