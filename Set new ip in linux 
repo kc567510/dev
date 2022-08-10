@@ -1,5 +1,9 @@
-ifconfig (可看目前IP資訊)
+ifconfig (可看目前IP, interfacc等資訊)
+
+ifconfig -a (可看目前IP, interfacc等資訊)
 
 ifconfig eth0 172.19.xx.xx (指定硬改)
+
+route  (可看routing table資訊)
 
 dhclient eth0  (用DHCP動態自動取得IP)

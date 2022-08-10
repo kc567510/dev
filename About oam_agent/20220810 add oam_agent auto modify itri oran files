@@ -1,0 +1,242 @@
+in oam_agent_hdlr.cpp
+
+static int change_oran_uplane_conf_cb(sr_session_ctx_t *session, const char *module_name, const char *xpath,
+            sr_event_t event, uint32_t request_id, void *private_data)
+{
+  ...
+  ...
+                    //add by kevin.chen at 20220810 for automatically modify itri /opt/oran/yang files about uplane-conf.yang
+					if( new_val->data.string_val!=NULL && strstr(new_val->data.string_val,"KHZ") && strstr(new_val->xpath, "low-level-tx-endpoints") ){ //for scs value
+						char* str = (char *)calloc(10, sizeof(char));
+						strcpy(str, new_val->data.string_val);
+						
+						int val = -1; //initial value
+						if( !strcmp(str, "KHZ_15") )//reference to o-ran-module-cap.yang line 150.
+							val = 0;
+						else if( !strcmp(str, "KHZ_30") )
+							val = 1;
+						else if( !strcmp(str, "KHZ_60") )
+							val = 2;
+						else if( !strcmp(str, "KHZ_120") )
+							val = 3;
+						else if( !strcmp(str, "KHZ_240") )
+							val = 4;
+						else if( !strcmp(str, "KHZ_1_25") )
+							val = 12;
+						else if( !strcmp(str, "KHZ_3_75") )
+							val = 13;
+						else if( !strcmp(str, "KHZ_5") )
+							val = 14;
+						else if( !strcmp(str, "KHZ_7_5") )
+							val = 15;
+										
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/low-level-tx-endpoints_name__itri-low-level-tx-endpoints__/number-of-prb-per-scs_scs__KHZ_30__/scs","w");
+						if( file==NULL ){
+							printf("open file scs fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write str: %s->val: %d to the scs file\n", str, val);
+						}
+						fclose(file);
+						free(str);
+					}
+					//end by kevin.chen
+   ...
+   ...
+                    //add by kevin.chen at 20220808 for automatically modify itri /opt/oran/yang files
+					if( strstr(new_val->xpath,"absolute-frequency-center") && strstr(new_val->xpath, "tx-array-carriers") ){ //for absolute-frequency-center value
+						int val = (int)new_val->data.uint32_val;
+						
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/tx-array-carriers_name__itri-tx-array-carriers__/absolute-frequency-center","w");
+						if( file==NULL ){
+							printf("open file absolute-frequency-center fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write val: %d to the absolute-frequency-center  file\n",val);
+						}
+						fclose(file);
+					}
+					else if( !strstr(new_val->xpath,"center-of-channel-bandwidth") && strstr(new_val->xpath,"channel-bandwidth") && strstr(new_val->xpath, "tx-array-carriers") ){ //for channel-bandwidth value but not center-of-channel-bandwidth
+						int val = (int)new_val->data.uint64_val;
+						
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/tx-array-carriers_name__itri-tx-array-carriers__/channel-bandwidth","w");
+						if( file==NULL ){
+							printf("open file channel-bandwidth fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write val: %d to the channel-bandwidth  file\n",val);
+						}
+						fclose(file);
+					}
+					else if( strstr(new_val->xpath,"bitwidth") && strstr(new_val->xpath, "low-level-tx-endpoints") ){ //for compression bits value
+						int val = (int)new_val->data.uint8_val;
+						
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/low-level-tx-endpoints_name__itri-low-level-tx-endpoints__/compression/bitwidth","w");
+						if( file==NULL ){
+							printf("open file compression/bitwidth fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write val: %d to the compression/bitwidth  file\n",val);
+						}
+						fclose(file);
+					}
+					else if( strstr(new_val->xpath,"gain") && strstr(new_val->xpath, "tx-array-carriers") ){ //for tx-gain value
+						//printf("found substring 'gain' in %s\n", new_val->xpath);
+						//printf("new gain value: %g\n", new_val->data.decimal64_val);
+						int val = (int)new_val->data.decimal64_val;
+						
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/tx-array-carriers_name__itri-tx-array-carriers__/gain","w");
+						if( file==NULL ){
+							printf("open file tx-gain fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write val: %d to the gain file\n",val);
+						}
+						fclose(file);
+					}
+					else if( strstr(new_val->xpath,"gain-correction") && strstr(new_val->xpath, "rx-array-carriers") ){ //for rx-gain-correction value
+						int val = (int)new_val->data.decimal64_val;
+						
+						file=fopen("/opt/oran/o-ran-uplane-conf/user-plane-configuration/rx-array-carriers_name__itri-rx-array-carriers__/gain-correction","w");
+						if( file==NULL ){
+							printf("open file rx-gain fail\n");
+						}
+						else{
+							fprintf(file, "%d\n", val); //write file
+							printf("write val: %d to the gain-correction file\n",val);
+						}
+						fclose(file);
+					}
+		
+					//end by kevin.chen
+}
+
+static int change_oran_process_elem_cb(sr_session_ctx_t *session, const char *module_name, const char *xpath,
+            sr_event_t event, uint32_t request_id, void *private_data)
+{
+    ...
+    ...
+    //add by kevin.chen at 20220808 for automatically modify itri /opt/oran/yang files about processing-element
+	  if (event == SR_EV_DONE)
+      {
+		
+		int ret;
+        sr_change_iter_t *iter;
+        sr_change_oper_t op;
+        sr_val_t *old_val, *new_val;
+		
+		// get changes iter 
+		
+        ret = sr_get_changes_iter(session, XPATH_ORAN_PROCESS_ELEM_ITER, &iter);
+		//printf("ret:%d\n", ret);
+        if (ret != SR_ERR_OK)
+        {
+            printf("[sr_get_changes_iter] error\n");
+            return -1;
+        }
+		
+		ret = sr_get_change_next(session, iter, &op, &old_val, &new_val);
+		//printf("ret:%d\n", ret);
+        //t_cfg_action action = T_CFG_CREATE;
+		
+        while (ret == SR_ERR_OK)
+        {
+            switch (op)
+            {
+                case SR_OP_CREATED:
+                    printf("[ SR_OP_CREATED ]\n");
+                    printf("%s =\n", new_val->xpath);
+                    cdb_print_val(new_val);
+                    //oam_agent::oam_agent_hdlr::get_instance()->dynamic_cfg_read(XPATH_ORAN_PROCESS_ELEM, action, op, new_val);
+					
+					FILE *file;
+					if( strstr(new_val->xpath,"o-du-mac-address") && strstr(new_val->xpath, "eth-flow") ){ //for o-du-mac-address value
+	                    char* str = (char *)calloc(20, sizeof(char));
+	  	                strcpy(str, new_val->data.string_val);
+	  	                char* tok;
+						char* str_reform = (char *)calloc(12, sizeof(char));
+						
+						tok = strtok(str, ":"); //remove ":"
+						while (tok != NULL) {
+							strcat(str_reform, tok); //concatenate string
+							//printf("%s\n", tok);
+							tok = strtok(NULL, ":");		   
+						}
+						
+	  	                file=fopen("/opt/oran/o-ran-processing-elements/processing-elements/ru-elements_name__ITRI_RU__/transport-flow/eth-flow/o-du-mac-address","w");
+	  	                if( file==NULL ){
+	  	                	printf("open file o-du-mac-address fail\n");
+	  	                }
+	  	                else{
+	  	                	fprintf(file, "%s\n", str_reform); //write file
+	  	                	printf("write string: %s to the o-du-mac-address file\n", str_reform);
+	  	                }
+	  	                fclose(file);
+	  	                free(str);
+						free(str_reform);
+					}
+	                else if( strstr(new_val->xpath,"ru-mac-address") && strstr(new_val->xpath, "eth-flow") ){ //for ru-mac-address value
+	                	char* str = (char *)calloc(20, sizeof(char));
+	                	strcpy(str, new_val->data.string_val);
+						
+	  	                char* tok;
+						char* str_reform = (char *)calloc(12, sizeof(char));
+						
+						tok = strtok(str, ":"); //remove ":"
+						while (tok != NULL) {
+							strcat(str_reform, tok); //concatenate string
+							//printf("%s\n", tok);
+							tok = strtok(NULL, ":");		   
+						}
+	                	file=fopen("/opt/oran/o-ran-processing-elements/processing-elements/ru-elements_name__ITRI_RU__/transport-flow/eth-flow/ru-mac-address","w");
+	                	if( file==NULL ){
+	                		printf("open file ru-mac-address fail\n");
+	                	}
+	                	else{
+	                		fprintf(file, "%s\n", str_reform); //write file
+	                		printf("write string: %s to the ru-mac-address file\n", str_reform);
+	                	}
+	                	fclose(file);
+	                	free(str);
+						free(str_reform);
+	                }
+                    sr_free_val(new_val);
+                    break;
+                case SR_OP_MODIFIED:
+                    printf("[ SR_OP_MODIFIED ]\n");
+                    printf("%s =\n", new_val->xpath);
+                    printf("old = ");
+                    cdb_print_val(old_val);
+                    printf("\nnew = ");
+                    cdb_print_val(new_val);
+                    printf("\n");
+                    //oam_agent::oam_agent_hdlr::get_instance()->dynamic_cfg_read(XPATH_ORAN_PROCESS_ELEM, action, op, new_val);
+					
+                    sr_free_val(old_val);
+                    sr_free_val(new_val);
+                    break;
+                case SR_OP_DELETED:
+                    printf("[ SR_OP_DELETED ]\n");
+                    break;
+                case SR_OP_MOVED:
+                    printf("[ SR_OP_MOVED ]\n");
+                    break;
+                default:
+                    break;
+            }
+
+            ret = sr_get_change_next(session, iter, &op, &old_val, &new_val);
+            //action = T_CFG_APPEND;
+        }
+        sr_free_change_iter(iter);
+        //oam_agent::oam_agent_hdlr::get_instance()->dynamic_cfg_read(XPATH_ORAN_PROCESS_ELEM, T_CFG_SEND, op, nullptr);
+      }
+	  //end by kevin.chen
+}
+
+

@@ -1,0 +1,2 @@
+scp -r 來源  目的地
+scp -r itri/ kevin@172.19.67.12:/home/kevin/itri

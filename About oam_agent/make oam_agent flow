@@ -51,3 +51,13 @@ oam_agent_receiver_thread::on_init::
 
 接著便可順利執行 nertopeer2-server與client端連線
 
+//update new version of oam_agent to the oru
+cd /opt/oam_agent
+rm *
+ftpget -u cisco -p 123456 172.19.205.181 oam.zip
+unzip oam.zip
+chmod 777 *
+
+
+//change all files permission to 777 recursively
+chmod -R 777 ./
