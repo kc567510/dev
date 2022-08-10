@@ -1,4 +1,4 @@
-in oam_agent_hdlr.cpp
+in oam_agent_hdlr.cpp can auto modify itri oran files at /opt/oran/......
 
 static int change_oran_uplane_conf_cb(sr_session_ctx_t *session, const char *module_name, const char *xpath,
             sr_event_t event, uint32_t request_id, void *private_data)
