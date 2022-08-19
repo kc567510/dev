@@ -17,9 +17,20 @@ ifconfig eth0 up
    1. 102branch 的也是一樣大 620MB 
 
 20220515
-   1. 澄清為memory損壞造成網路功能異常
+   1. 澄清為memory損壞造成網路功能異常 ->ok!
 
 
 20220520
-   1.下周開始可能要準備其他關於自動化call home的部分
-   
+   1.下周開始可能要準備其他關於自動化call home的部分-> OK!
+
+
+20220815
+   1. 當設定processing element時，oam agent會出現wait provision done的錯誤訊息 可能要改oam agent來看一下
+   2. loop back message的部分還望由itri幫忙解決，使connectivity check功能更完善，讓EMS有地方可以讀取目前了連線狀態
+   3. 目前正在看mplane-file management內容
+   4. how to use sftp in oru? need install sftp in petalinux?
+
+20220819
+   1. 0822起看adrv9026.elf的src code
+   2. 主要看sync timing 改成 gps 或是關於5518控制的lib or code
+   3. 

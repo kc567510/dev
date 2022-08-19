@@ -12,4 +12,4 @@ git reset --hard 384ddd4 //回到版本384ddd4，切記回到之前版本別用 
 ./go.oru make vranstack 
 
 
- git reset --hard HEAD~~
+ git reset --hard HEAD~~ //退回前一版
