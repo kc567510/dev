@@ -1,0 +1,266 @@
+1. first execute /usr/bin/lite-on-load-5518.sh //line 515
+    1.1 Load FPGA HW only first time to enable EMIO access to PLL Chipset SPI - Required only with FMC design...
+        fpgautil -b /lib/firmware/base/system_top.bit.bin
+
+    1.2 Reload FPGA and initialize kernel drivers for ethernet and 1588 TOD and wait 10 seconds...
+        fpgautil -b /lib/firmware/base/system_top.bit.bin -o /lib/firmware/base/base.dtbo
+
+    1.3 Assigning IP address to ethernet interface...
+        pass
+    
+    1.4 Read FPGA configuration registers and print hardware version embedded in USR_ACCESS...
+        fpgautil -r
+        cat readback.bin | grep AXSS
+    
+    1.5 Restarting Sync Timing Driver...
+        /etc/init.d/synctimingdriver.sh stop
+        /etc/init.d/synctimingdriver.sh start
+    
+    1.6 Interface on
+        ifconfig eth0 up
+        ifconfig eth0 10.101.131.60
+
+2. sync_timing_util -v  //line 519
+    2.1 show result
+        gSyncTimingUtilInfo.SyncTimingUtilOpn = 10
+        **************************************************************************
+        Chipset Revision = B0
+        Bootloader Version = 2.3.0_564224
+        Firmware Version = 1.0.0_svn_6447
+        Fplan Version = 1.0.0_svn_6448
+        Fplan Design Id = Mode1
+        CBPro Version = 4.1.5.111
+        Driver Version = 3.3.1_1
+        Driver Build Info = Sync Timing Reference Design SW Release 3.1.1
+
+        **************************************************************************
+
+3. cat /mnt/sdcard/oran/boot-flag/boot-flag
+    3.1 show 1100
+
+4. iic_eeprom_init();
+5. zcu102_GpioReset();
+6. copy oran folder
+7. show  10GbE SDK debug mode info
+8. create pthread
+
+9. //initial config for framer/deframer
+    // VLANID_C[11:0], VLANID_U[27:16] I
+    	system("busybox devmem 0x8000101C 32 0x02340234");
+    // bypass_win_chk
+    	system("busybox devmem 0x80002444 32 0x00000001");
+    // vlanEn[0], VLANID_M[27:0]
+    	system("busybox devmem 0x8000103C 32 0x00000001");
+    //Eth sysConfigDone
+	    system("busybox devmem 0x80001020 32 0x00000001");
+    //debug
+	    system("busybox devmem 0x8000100C 32 0x00000001");
+    //output 1pps
+	    system("busybox devmem 0x80002030 32 0x00000001");
+    //esmc
+        system("sync_timing_util -P 0 -I 0");
+        system("esmcconfig start /etc/sync_timing_esmc_aruba_ptp_steered_rf_default.conf");
+
+10. //ru-controller.c line 741, 742
+
+    arg2 = 2;
+  =>pthread_create(&t2, NULL, thread_proc, &arg2);
+
+11. //run silab ptp
+	    system("ptp2config start /etc/sync_timing_ptp2_boundary_clock_G_8275_1_multicast.conf");
+
+		while(1)
+		{
+			system("ptp2config t s >/usr/bin/sync_status.txt");
+			printf("read sync_status\n");
+			result = Search_in_File();
+			if(result == -1) {
+				printf("******Search_file error\n");
+			}
+			usleep(10*1000*1000);
+		}
+
+        // for ptp2config t s 
+        (t)time
+            (i)info : Print time and synchronization information.
+            (s)sync : Print synchronization status.
+
+    int Search_in_File() 
+    {
+        FILE *fp;
+        char str1[100]="NOT SYNCHRONIZED/SYNCHRONIZING";
+        char str2[100]="NOT SYNCHRONIZED/HOLDOVER";
+        char str3[100]="SYNCHRONIZED/SYNCHRONIZING";
+        char str4[100]="SYNCHRONIZED/HOLDOVER";
+
+        if((fp = fopen("/usr/bin/sync_status.txt", "r")) == NULL) {
+            printf("open sync_status failure\n");
+            return(-1);
+        }
+
+        while(fgets(temp, 512, fp) != NULL) {
+            if((strstr(temp, str1)) != NULL) {
+                ...
+            }
+            else if((strstr(temp, str2)) != NULL) {
+                ...
+            }
+            else if((strstr(temp, str3)) != NULL) {
+                //printf("A match found on line: %d\n", line_num);
+                printf("\n%s\n", temp);
+                s8Silab_Sync_Ok_Flag=1;
+                if (u8count==1){
+                    u8Dpd_iniFlag=1;
+                    u8count=2;
+                }
+                system("busybox devmem 0x800025c8 32 1");
+                //printf("s8Silab_Sync_Ok_Flag_str3=%d\n",s8Silab_Sync_Ok_Flag);
+                find_result++;
+            }
+            ...
+        }
+    }
+12. followe 10. ru-controller.c line 173
+    void thread_proc(void *args) {
+        int *id = (int *)args;
+        int times = 5;
+        int priority = 0;
+        ...
+        else if (*id == 2)
+        {
+            priority = 80;
+            printf("[%s]: id = %d, priority=%d.\n", __func__, *id, priority);
+            sys_pthread_set_prio(priority, SCHED_FIFO);
+            printf("[%s]: call ru_platform_event_process_task().\n", __func__);
+
+          =>ru_platform_event_process_task();
+        }
+        ...
+    }
+
+13. at src\M5_Platform_Event_Process.c func int ru_platform_event_process_task(void) line 105
+    while(1)
+    {
+#if 1
+        if(gstPepObj.u32State == PEP_RUN_ST)
+        {
+            static uint64_t u64LatestTti = 0;
+            uint64_t u64CurrTti = 0;
+            TTI_GET(u64StartTime, u64CurrTti);
+            if(u64CurrTti > u64LatestTti)
+            {
+                //printf("u64LatestTti = %llu u64CurrTti == %llu\n", u64LatestTti, u64CurrTti);
+                u64LatestTti = u64CurrTti;
+                Time2PepEnq();
+            }
+        }
+
+      =>Pep_StateMachine();
+#endif
+        Pep_StateMachine();
+        usleep(10000);
+    }
+
+14. at src\M5_Platform_Event_Process.c line 352
+    ERR_TYPE Pep_StateMachine()
+    {
+      =>STATE_PEP_GET_QUEUE(gstPepObj, qinMep2Pep);
+        STATE_PEP_GET_QUEUE(gstPepObj, qinSep2Pep);
+        STATE_PEP_GET_QUEUE(gstPepObj, qinTime2Pep);
+	
+    return NO_ERR;
+    }
+
+15. at src\M5_Platform_Event_Process_Macro.h
+    #define STATE_PEP_GET_QUEUE(Obj, QueueName)                                                                 \
+    {                                                                                                       \
+        EvtObj evt;                                                                                         \
+        ERR_TYPE ErrType = NO_ERR;                                                                          \
+        PEP_OBJ_STRUCT *pPepObj = &Obj;                                                                     \
+        while ( EQ_EMPTY != getEventFromQue(&(Obj.QueueName), &evt) )                                       \
+        {                                                                                                   \
+          =>ErrType = (*pfPepFuncTbl[ppu32PepFuncTbl[evt.u32EvtId][pPepObj->u32State]])(pPepObj, &evt);     \
+            if(ErrType != NO_ERR)                                                                           \
+            {                                                                                               \
+                /*printf("terminate %s\n" , __FUNCTION__);*/                                                \
+                break;                                                                                      \
+            }                                                                                               \
+        }                                                                                                   \
+    }
+
+16. at src\M5_Platform_Event_Process_StateMach_Func.c func pfPepFuncTbl
+    pfunc pfPepFuncTbl[7] =               \
+    {                                     \
+        Pep_ErrHdl,              /* F0 */ \
+        Pep_Sys_Disable,         /* F1 */ \
+        Pep_Sys_Init,            /* F2 */ \
+      =>Pep_Sys_Enable,          /* F3 */ \
+        Pep_Sync_Status,         /* F4 */ \
+        Pep_Sys_Agc,             /* F5 */ \
+        Pep_Sys_Per_Moni,        /* F6 */ \
+    };
+
+17 at src\M5_Platform_Event_Process_StateMach_Func.c
+    ERR_TYPE Pep_Sys_Enable(void *pstObj, void *param)
+    {
+        PEP_OBJ_STRUCT *pstPepObjStruct = (PEP_OBJ_STRUCT *)pstObj;
+    #if defined(XDPD_ENABLE)
+        if ((u8Dpd_Flag==1)||(u8DpdGui_Flag!=0))
+        {
+            if (cfrEnFlag3==1)
+                system("busybox devmem 0x80002448 32 0x000024DA"); // for 3 stages CFR engines
+            else
+                system("busybox devmem 0x80002448 32 0x000023E0"); // for 2 stages CFR engines
+
+        }
+        else
+        {
+            txall_gpio_enable();
+            orxall_gpio_enable();
+            rxall_gpio_enable();
+        }
+        SYS_PL_ENABLE(1);
+        PEP_OBJ_STATE_REC(PEP_RUN_ST);
+        //if (s8Sync_Flag==0)
+        if(s8Silab_Sync_Init_Flag==0)
+        {
+            usleep(3000000);
+            printf("run CFR + DPD + CLGC function. \n");
+          =>dpd_main(u8Dpd_Flag, u8DpdGui_Flag);
+            u8Dpd_iniFlag_ok=1;
+        }
+    #endif
+        return NO_ERR;
+    }
+
+18. at src\dpd_api.c funciton dpd_main()
+    //printf("[Step 6+7] adi_adrv9025_CFRENABLE \n");
+				adi_adrv9025_CFRENABLE(device, port_select);
+
+    printf("[Step 8] Load the DPD model\n");
+				dpdModelRestoreFromFile (device);
+
+    printf("[Step 9] Assert DPD Reset\n");
+				resetDpdFull (device, port_select);
+
+    printf("[Step 10] Setup DPD mode of operation, DPD peak search window size and low power threshold\n");
+				dpdTrackingConfigSet (device, port_select);
+
+    printf("[Step 11] Setup DPD fault conditions and recovery actions(optional)\n");
+				dpdFaultRecovery(device,ADI_ADRV9025_TX1);
+				dpdFaultRecovery(device,ADI_ADRV9025_TX2);
+				dpdFaultRecovery(device,ADI_ADRV9025_TX3);
+				dpdFaultRecovery(device,ADI_ADRV9025_TX4);
+
+    printf("[Step 12] Setup CLGC configurations and target loop gain\n");
+				clgcTrackingConfigSet(device, port_select);
+
+    printf("[Step 13] Enable Tx QEC and Tx LO Leakage tracking Calibrations\n");
+				txLolTrackingCalEnable (device, port_select, ADI_ADRV9025_TRACKING_CAL_ENABLE); //Enable DPD tracking cal
+				txQecTrackingCalEnable (device, port_select, ADI_ADRV9025_TRACKING_CAL_ENABLE); //Enable DPD tracking cal
+
+    printf("[Step 14] Enable DPD Tracking Calibration\n");
+				dpdTrackingCalEnable (device, port_select, ADI_ADRV9025_TRACKING_CAL_ENABLE); //Enable DPD tracking cal
+
+    printf("[Step 15] Enable CLGC Tracking Calibration\n");
+				clgcTrackingCalEnable (device, port_select, ADI_ADRV9025_TRACKING_CAL_ENABLE); //Enable CLGC tracking cal

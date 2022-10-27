@@ -1,0 +1,2 @@
+server: iperf -u -s -i 1
+client: iperf -u -c 172.19.205.216 -i 1 -t 120 -l 1400 -b 2g

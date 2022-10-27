@@ -13,3 +13,9 @@ git reset --hard 384ddd4 //回到版本384ddd4，切記回到之前版本別用 
 
 
  git reset --hard HEAD~~ //退回前一版
+
+//如果已經git add之後想要針對某些檔案反悔
+ git reset HEAD -filename
+
+ //如果已經git add之後想要全部反悔
+ git reset HEAD .

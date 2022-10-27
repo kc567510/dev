@@ -433,3 +433,400 @@ module: ietf-ip
           x--ro origin?               neighbor-origin
           x--ro is-router?            empty
           x--ro state?                enumeration
+
+
+module: o-ran-uplane-conf
+  +--rw user-plane-configuration
+     +--rw low-level-tx-links* [name]
+     |  +--rw name                     string
+     |  +--rw processing-element       -> /o-ran-processing-element:processing-elements/o-ran-processing-element:ru-elements/o-ran-processing-element:name
+     |  +--rw tx-array-carrier         -> /user-plane-configuration/tx-array-carriers/name
+     |  +--rw low-level-tx-endpoint    -> /user-plane-configuration/low-level-tx-endpoints/name
+     +--rw low-level-rx-links* [name]
+     |  +--rw name                         string
+     |  +--rw processing-element           -> /o-ran-processing-element:processing-elements/o-ran-processing-element:ru-elements/o-ran-processing-element:name
+     |  +--rw rx-array-carrier             -> /user-plane-configuration/rx-array-carriers/name
+     |  +--rw low-level-rx-endpoint        -> /user-plane-configuration/low-level-rx-endpoints/name
+     |  +--rw user-plane-uplink-marking?   -> /o-ran-processing-element:processing-elements/o-ran-processing-element:enhanced-uplane-mapping/o-ran-processing-element:uplane-mapping/o-ran-processing-element:up-marking-name
+     +--ro endpoint-types* [id]
+     |  +--ro id                                        uint16
+     |  +--ro supported-section-types* [section-type]
+     |  |  +--ro section-type                    uint8
+     |  |  +--ro supported-section-extensions*   uint8
+     |  +--ro supported-frame-structures*               uint8
+     |  +--ro managed-delay-support?                    enumeration
+     |  +--ro multiple-numerology-supported?            boolean <true>
+     |  +--ro max-numerology-change-duration?           uint16
+     |  +--ro max-control-sections-per-data-section?    uint8
+     |  +--ro max-sections-per-symbol?                  uint16
+     |  +--ro max-sections-per-slot?                    uint16
+     |  +--ro max-highest-priority-sections-per-slot?   uint16
+     |  +--ro max-remasks-per-section-id?               uint8 <12>
+     |  +--ro max-beams-per-symbol?                     uint16
+     |  +--ro max-beams-per-slot?                       uint16
+     |  +--ro max-prb-per-symbol?                       uint16
+     |  +--ro prb-capacity-allocation-granularity*      uint16
+     |  +--ro max-numerologies-per-symbol?              uint16
+     +--ro endpoint-capacity-sharing-groups* [id]
+     |  +--ro id                                        uint16
+     |  +--ro max-control-sections-per-data-section?    uint8
+     |  +--ro max-sections-per-symbol?                  uint16
+     |  +--ro max-sections-per-slot?                    uint16
+     |  +--ro max-highest-priority-sections-per-slot?   uint16
+     |  +--ro max-remasks-per-section-id?               uint8 <12>
+     |  +--ro max-beams-per-symbol?                     uint16
+     |  +--ro max-beams-per-slot?                       uint16
+     |  +--ro max-prb-per-symbol?                       uint16
+     |  +--ro max-numerologies-per-symbol?              uint16
+     |  +--ro max-endpoints?                            uint16
+     |  +--ro max-managed-delay-endpoints?              uint16
+     |  +--ro max-non-managed-delay-endpoints?          uint16
+     +--ro endpoint-prach-group* [id]
+     |  +--ro id                                  uint16
+     |  +--ro supported-prach-preamble-formats*   prach-preamble-format
+     +--ro supported-compression-method-sets* [id]
+     |  +--ro id                              uint16
+     |  +--ro compression-method-supported*
+     |     +--ro iq-bitwidth?            uint8
+     |     +--ro (compression-format)?
+     |     |  +--:(no-compresison)
+     |     |  +--:(block-floating-point)
+     |     |  |  +--ro exponent?   uint8
+     |     |  +--:(block-floating-point-selective-re-sending)
+     |     |  |  +--ro sres-exponent?   uint8
+     |     |  +--:(block-scaling)
+     |     |  |  +--ro block-scalar?   uint8
+     |     |  +--:(u-law)
+     |     |  |  +--ro comp-bit-width?   uint8
+     |     |  |  +--ro comp-shift?       uint8
+     |     |  +--:(beam-space-compression)
+     |     |  |  +--ro active-beam-space-coeficient-mask*   uint8
+     |     |  |  +--ro block-scaler?                        uint8
+     |     |  +--:(modulation-compression)
+     |     |  |  +--ro csf?               uint8
+     |     |  |  +--ro mod-comp-scaler?   uint16
+     |     |  +--:(modulation-compression-selective-re-sending)
+     |     |     +--ro sres-csf?               uint8
+     |     |     +--ro sres-mod-comp-scaler?   uint16
+     |     +--ro fs-offset*              uint8 {o-ran-compression-factors:CONFIGURABLE-FS-OFFSET}?
+     +--ro static-low-level-tx-endpoints* [name]
+     |  +--ro name                                  string
+     |  +--ro restricted-interfaces*                -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
+     |  +--ro array                                 -> /user-plane-configuration/tx-arrays/name
+     |  +--ro endpoint-type?                        -> ../../endpoint-types/id
+     |  +--ro capacity-sharing-groups*              -> ../../endpoint-capacity-sharing-groups/id
+     |  +--ro supported-reference-level* [id] {TX-REFERENCE-LEVEL}?
+     |  |  +--ro id     uint16
+     |  |  +--ro min    decimal64
+     |  |  +--ro max    decimal64
+     |  +--ro compression
+     |  |  +--ro dynamic-compression-supported?           boolean
+     |  |  +--ro realtime-variable-bit-width-supported?   boolean
+     |  |  +--ro supported-compression-set-id?            -> ../../../supported-compression-method-sets/id
+     |  +--ro configurable-tdd-pattern-supported?   boolean <false> {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     |  +--ro tdd-group?                            uint8
+     +--ro static-low-level-rx-endpoints* [name]
+     |  +--ro name                                  string
+     |  +--ro restricted-interfaces*                -> /ietf-interfaces:interfaces/ietf-interfaces:interface/ietf-interfaces:name
+     |  +--ro array                                 -> /user-plane-configuration/rx-arrays/name
+     |  +--ro endpoint-type?                        -> ../../endpoint-types/id
+     |  +--ro capacity-sharing-groups*              -> ../../endpoint-capacity-sharing-groups/id
+     |  +--ro prach-group?                          -> ../../endpoint-prach-group/id
+     |  +--ro compression
+     |  |  +--ro dynamic-compression-supported?           boolean
+     |  |  +--ro realtime-variable-bit-width-supported?   boolean
+     |  |  +--ro supported-compression-set-id?            -> ../../../supported-compression-method-sets/id
+     |  +--ro static-config-supported?              enumeration <NONE>
+     |  +--ro max-prach-patterns?                   uint8
+     |  +--ro max-srs-patterns?                     uint8
+     |  +--ro configurable-tdd-pattern-supported?   boolean <false> {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     |  +--ro tdd-group?                            uint8
+     +--rw low-level-tx-endpoints* [name]
+     |  +--rw name                                   -> /user-plane-configuration/static-low-level-tx-endpoints/name
+     |  +--rw compression!
+     |  |  +--rw iq-bitwidth?                         uint8
+     |  |  +--rw compression-type                     enumeration
+     |  |  x--rw bitwidth?                            uint8
+     |  |  +--rw (compression-format)?
+     |  |  |  +--:(no-compresison)
+     |  |  |  +--:(block-floating-point)
+     |  |  |  |  +--rw exponent?   uint8
+     |  |  |  +--:(block-floating-point-selective-re-sending)
+     |  |  |  |  +--rw sres-exponent?   uint8
+     |  |  |  +--:(block-scaling)
+     |  |  |  |  +--rw block-scalar?   uint8
+     |  |  |  +--:(u-law)
+     |  |  |  |  +--rw comp-bit-width?   uint8
+     |  |  |  |  +--rw comp-shift?       uint8
+     |  |  |  +--:(beam-space-compression)
+     |  |  |  |  +--rw active-beam-space-coeficient-mask*   uint8
+     |  |  |  |  +--rw block-scaler?                        uint8
+     |  |  |  +--:(modulation-compression)
+     |  |  |  |  +--rw csf?               uint8
+     |  |  |  |  +--rw mod-comp-scaler?   uint16
+     |  |  |  +--:(modulation-compression-selective-re-sending)
+     |  |  |     +--rw sres-csf?               uint8
+     |  |  |     +--rw sres-mod-comp-scaler?   uint16
+     |  |  +--rw fs-offset?                           uint8 <0> {o-ran-compression-factors:CONFIGURABLE-FS-OFFSET}?
+     |  |  +--rw dynamic-compression-configuration* [id]
+     |  |     +--rw id                    uint16
+     |  |     +--rw iq-bitwidth?          uint8
+     |  |     +--rw compression-method?   enumeration
+     |  |     +--rw fs-offset?            uint8 <0> {o-ran-compression-factors:CONFIGURABLE-FS-OFFSET}?
+     |  +--rw frame-structure?                       uint8
+     |  +--rw cp-type?                               enumeration
+     |  +--rw cp-length                              uint16
+     |  +--rw cp-length-other                        uint16
+     |  +--rw offset-to-absolute-frequency-center    int32
+     |  +--rw number-of-prb-per-scs* [scs]
+     |  |  +--rw scs              o-ran-module-cap:scs-config-type
+     |  |  +--rw number-of-prb    uint16
+     |  +--rw e-axcid
+     |  |  +--rw o-du-port-bitmask      uint16
+     |  |  +--rw band-sector-bitmask    uint16
+     |  |  +--rw ccid-bitmask           uint16
+     |  |  +--rw ru-port-bitmask        uint16
+     |  |  +--rw eaxc-id                uint16
+     |  +--rw coupling-to?                           -> /o-ran-module-cap:module-capability/o-ran-module-cap:ru-capabilities/o-ran-module-cap:coupling-methods/o-ran-module-cap:coupling-via-frequency-and-time
+     |  +--rw coupling-method?                       enumeration <NORMAL>
+     |  +--rw configurable-tdd-pattern-supported?    -> /user-plane-configuration/static-low-level-rx-endpoints[name=current()/../name]/configurable-tdd-pattern-supported {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     +--rw low-level-rx-endpoints* [name]
+     |  +--rw name                                   -> /user-plane-configuration/static-low-level-rx-endpoints/name
+     |  +--rw compression
+     |  |  +--rw iq-bitwidth?                         uint8
+     |  |  +--rw compression-type                     enumeration
+     |  |  x--rw bitwidth?                            uint8
+     |  |  +--rw (compression-format)?
+     |  |  |  +--:(no-compresison)
+     |  |  |  +--:(block-floating-point)
+     |  |  |  |  +--rw exponent?   uint8
+     |  |  |  +--:(block-floating-point-selective-re-sending)
+     |  |  |  |  +--rw sres-exponent?   uint8
+     |  |  |  +--:(block-scaling)
+     |  |  |  |  +--rw block-scalar?   uint8
+     |  |  |  +--:(u-law)
+     |  |  |  |  +--rw comp-bit-width?   uint8
+     |  |  |  |  +--rw comp-shift?       uint8
+     |  |  |  +--:(beam-space-compression)
+     |  |  |  |  +--rw active-beam-space-coeficient-mask*   uint8
+     |  |  |  |  +--rw block-scaler?                        uint8
+     |  |  |  +--:(modulation-compression)
+     |  |  |  |  +--rw csf?               uint8
+     |  |  |  |  +--rw mod-comp-scaler?   uint16
+     |  |  |  +--:(modulation-compression-selective-re-sending)
+     |  |  |     +--rw sres-csf?               uint8
+     |  |  |     +--rw sres-mod-comp-scaler?   uint16
+     |  |  +--rw fs-offset?                           uint8 <0> {o-ran-compression-factors:CONFIGURABLE-FS-OFFSET}?
+     |  |  +--rw dynamic-compression-configuration* [id]
+     |  |     +--rw id                    uint16
+     |  |     +--rw iq-bitwidth?          uint8
+     |  |     +--rw compression-method?   enumeration
+     |  |     +--rw fs-offset?            uint8 <0> {o-ran-compression-factors:CONFIGURABLE-FS-OFFSET}?
+     |  +--rw frame-structure?                       uint8
+     |  +--rw cp-type?                               enumeration
+     |  +--rw cp-length                              uint16
+     |  +--rw cp-length-other                        uint16
+     |  +--rw offset-to-absolute-frequency-center    int32
+     |  +--rw number-of-prb-per-scs* [scs]
+     |  |  +--rw scs              o-ran-module-cap:scs-config-type
+     |  |  +--rw number-of-prb    uint16
+     |  +--rw ul-fft-sampling-offsets* [scs]
+     |  |  +--rw scs                       o-ran-module-cap:scs-config-type
+     |  |  +--rw ul-fft-sampling-offset?   uint16
+     |  +--rw e-axcid
+     |  |  +--rw o-du-port-bitmask      uint16
+     |  |  +--rw band-sector-bitmask    uint16
+     |  |  +--rw ccid-bitmask           uint16
+     |  |  +--rw ru-port-bitmask        uint16
+     |  |  +--rw eaxc-id                uint16
+     |  +--rw eaxc-gain-correction?                  decimal64 <0.0> {EAXC-GAIN-CORRECTION}?
+     |  +--rw non-time-managed-delay-enabled?        boolean <false>
+     |  +--rw coupling-to?                           -> /o-ran-module-cap:module-capability/o-ran-module-cap:ru-capabilities/o-ran-module-cap:coupling-methods/o-ran-module-cap:coupling-via-frequency-and-time
+     |  +--rw coupling-method?                       enumeration <NORMAL>
+     |  +--rw static-config-supported?               -> /user-plane-configuration/static-low-level-rx-endpoints[name=current()/../name]/static-config-supported
+     |  +--rw static-prach-configuration?            -> /user-plane-configuration/static-prach-configurations/static-prach-config-id {o-ran-module-cap:PRACH-STATIC-CONFIGURATION-SUPPORTED}?
+     |  +--rw static-srs-configuration?              -> /user-plane-configuration/static-srs-configurations/static-srs-config-id {o-ran-module-cap:SRS-STATIC-CONFIGURATION-SUPPORTED}?
+     |  +--rw configurable-tdd-pattern-supported?    -> /user-plane-configuration/static-low-level-rx-endpoints[name=current()/../name]/configurable-tdd-pattern-supported {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     +--rw tx-array-carriers* [name]
+     |  +--rw name                           string
+     |  x--rw absolute-frequency-center?     uint32
+     |  +--rw center-of-channel-bandwidth    uint64
+     |  +--rw channel-bandwidth              uint64
+     |  +--rw active?                        enumeration <INACTIVE>
+     |  +--ro state                          enumeration
+     |  +--rw type?                          enumeration
+     |  +--ro duplex-scheme?                 enumeration
+     |  +--rw rw-duplex-scheme?              -> /user-plane-configuration/tx-array-carriers[name=current()/../name]/duplex-scheme
+     |  +--rw rw-type?                       -> /user-plane-configuration/tx-array-carriers[name=current()/../name]/type
+     |  +--rw band-number?                   -> /o-ran-module-cap:module-capability/o-ran-module-cap:band-capabilities/o-ran-module-cap:band-number {o-ran-module-cap:LAA}?
+     |  x--rw lte-tdd-frame
+     |  |  x--rw subframe-assignment         enumeration
+     |  |  x--rw special-subframe-pattern    enumeration
+     |  +--rw laa-carrier-configuration {o-ran-module-cap:LAA}?
+     |  |  +--rw ed-threshold-pdsch?           int8
+     |  |  +--rw ed-threshold-drs?             int8
+     |  |  +--rw tx-antenna-ports?             uint8
+     |  |  +--rw transmission-power-for-drs?   int8
+     |  |  +--rw dmtc-period?                  enumeration
+     |  |  +--rw dmtc-offset?                  uint8
+     |  |  +--rw lbt-timer?                    uint16
+     |  |  +--rw max-cw-usage-counter* [priority]
+     |  |     +--rw priority         enumeration
+     |  |     +--rw counter-value?   uint8
+     |  +--rw gain                           decimal64
+     |  +--rw downlink-radio-frame-offset    uint32
+     |  +--rw downlink-sfn-offset            int16
+     |  +--rw reference-level?               decimal64 <0.0> {TX-REFERENCE-LEVEL}?
+     |  +--rw configurable-tdd-pattern?      -> /user-plane-configuration/configurable-tdd-patterns/tdd-pattern-id {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     +--rw rx-array-carriers* [name]
+     |  +--rw name                           string
+     |  x--rw absolute-frequency-center?     uint32
+     |  +--rw center-of-channel-bandwidth    uint64
+     |  +--rw channel-bandwidth              uint64
+     |  +--rw active?                        enumeration <INACTIVE>
+     |  +--ro state                          enumeration
+     |  +--rw type?                          enumeration
+     |  +--ro duplex-scheme?                 enumeration
+     |  +--rw downlink-radio-frame-offset    uint32
+     |  +--rw downlink-sfn-offset            int16
+     |  +--rw gain-correction                decimal64
+     |  +--rw n-ta-offset                    uint32
+     |  +--rw configurable-tdd-pattern?      -> /user-plane-configuration/configurable-tdd-patterns/tdd-pattern-id {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     +--ro tx-arrays* [name]
+     |  +--ro name                                      string
+     |  +--ro number-of-rows                            uint16
+     |  +--ro number-of-columns                         uint16
+     |  +--ro number-of-array-layers                    uint8
+     |  +--ro horizontal-spacing?                       decimal64
+     |  +--ro vertical-spacing?                         decimal64
+     |  +--ro normal-vector-direction
+     |  |  +--ro azimuth-angle?   decimal64
+     |  |  +--ro zenith-angle?    decimal64
+     |  +--ro leftmost-bottom-array-element-position
+     |  |  +--ro x?   decimal64
+     |  |  +--ro y?   decimal64
+     |  |  +--ro z?   decimal64
+     |  +--ro polarisations* [p]
+     |  |  +--ro p               uint8
+     |  |  +--ro polarisation    polarisation_type
+     |  +--ro band-number                               -> /o-ran-module-cap:module-capability/o-ran-module-cap:band-capabilities/o-ran-module-cap:band-number
+     |  +--ro max-gain                                  decimal64
+     |  +--ro independent-power-budget                  boolean
+     |  +--ro capabilities*
+     |     +--ro max-supported-frequency-dl?   uint64
+     |     +--ro min-supported-frequency-dl?   uint64
+     |     +--ro max-supported-bandwidth-dl?   uint64
+     |     +--ro max-num-carriers-dl?          uint32
+     |     +--ro max-carrier-bandwidth-dl?     uint64
+     |     +--ro min-carrier-bandwidth-dl?     uint64
+     |     +--ro supported-technology-dl*      enumeration
+     +--ro rx-arrays* [name]
+     |  +--ro name                                      string
+     |  +--ro number-of-rows                            uint16
+     |  +--ro number-of-columns                         uint16
+     |  +--ro number-of-array-layers                    uint8
+     |  +--ro horizontal-spacing?                       decimal64
+     |  +--ro vertical-spacing?                         decimal64
+     |  +--ro normal-vector-direction
+     |  |  +--ro azimuth-angle?   decimal64
+     |  |  +--ro zenith-angle?    decimal64
+     |  +--ro leftmost-bottom-array-element-position
+     |  |  +--ro x?   decimal64
+     |  |  +--ro y?   decimal64
+     |  |  +--ro z?   decimal64
+     |  +--ro polarisations* [p]
+     |  |  +--ro p               uint8
+     |  |  +--ro polarisation    polarisation_type
+     |  +--ro band-number                               -> /o-ran-module-cap:module-capability/o-ran-module-cap:band-capabilities/o-ran-module-cap:band-number
+     |  +--ro gain-correction-range
+     |  |  +--ro max    decimal64
+     |  |  +--ro min    decimal64
+     |  +--ro capabilities*
+     |     +--ro max-supported-frequency-ul?   uint64
+     |     +--ro min-supported-frequency-ul?   uint64
+     |     +--ro max-supported-bandwidth-ul?   uint64
+     |     +--ro max-num-carriers-ul?          uint32
+     |     +--ro max-carrier-bandwidth-ul?     uint64
+     |     +--ro min-carrier-bandwidth-ul?     uint64
+     |     +--ro supported-technology-ul*      enumeration
+     +--ro relations* [entity]
+     |  +--ro entity    uint16
+     |  +--ro array1
+     |  |  +--ro (antenna-type)?
+     |  |     +--:(tx)
+     |  |     |  +--ro tx-array-name?   -> /o-ran-uplane-conf:user-plane-configuration/o-ran-uplane-conf:tx-arrays/o-ran-uplane-conf:name
+     |  |     +--:(rx)
+     |  |        +--ro rx-array-name?   -> /o-ran-uplane-conf:user-plane-configuration/o-ran-uplane-conf:rx-arrays/o-ran-uplane-conf:name
+     |  +--ro array2
+     |  |  +--ro (antenna-type)?
+     |  |     +--:(tx)
+     |  |     |  +--ro tx-array-name?   -> /o-ran-uplane-conf:user-plane-configuration/o-ran-uplane-conf:tx-arrays/o-ran-uplane-conf:name
+     |  |     +--:(rx)
+     |  |        +--ro rx-array-name?   -> /o-ran-uplane-conf:user-plane-configuration/o-ran-uplane-conf:rx-arrays/o-ran-uplane-conf:name
+     |  +--ro types* [relation-type]
+     |     +--ro relation-type    enumeration
+     |     +--ro pairs* [element-array1]
+     |        +--ro element-array1    uint16
+     |        +--ro element-array2?   uint16
+     +--rw eaxc-id-group-configuration {o-ran-module-cap:EAXC-ID-GROUP-SUPPORTED}?
+     |  +--rw max-num-tx-eaxc-id-groups?       -> /o-ran-module-cap:module-capability/o-ran-module-cap:ru-capabilities/o-ran-module-cap:eaxcid-grouping-capabilities/o-ran-module-cap:max-num-tx-eaxc-id-groups
+     |  +--rw max-num-tx-eaxc-ids-per-group?   -> /o-ran-module-cap:module-capability/o-ran-module-cap:ru-capabilities/o-ran-module-cap:eaxcid-grouping-capabilities/o-ran-module-cap:max-num-tx-eaxc-ids-per-group
+     |  +--rw max-num-rx-eaxc-id-groups?       -> /o-ran-module-cap:module-capability/o-ran-module-cap:ru-capabilities/o-ran-module-cap:eaxcid-grouping-capabilities/o-ran-module-cap:max-num-rx-eaxc-id-groups
+     |  +--rw max-num-rx-eaxc-ids-per-group?   -> /o-ran-module-cap:module-capability/o-ran-module-cap:ru-capabilities/o-ran-module-cap:eaxcid-grouping-capabilities/o-ran-module-cap:max-num-rx-eaxc-ids-per-group
+     |  +--rw tx-eaxc-id-group* [representative-tx-eaxc-id]
+     |  |  +--rw representative-tx-eaxc-id    uint16
+     |  |  +--rw member-tx-eaxc-id*           uint16
+     |  +--rw rx-eaxc-id-group* [representative-rx-eaxc-id]
+     |     +--rw representative-rx-eaxc-id    uint16
+     |     +--rw member-rx-eaxc-id*           uint16
+     +--rw static-prach-configurations* [static-prach-config-id] {o-ran-module-cap:PRACH-STATIC-CONFIGURATION-SUPPORTED}?
+     |  +--rw static-prach-config-id    uint8
+     |  +--rw pattern-period            uint16
+     |  +--rw guard-tone-low-re         uint32
+     |  +--rw num-prach-re              uint32
+     |  +--rw guard-tone-high-re        uint32
+     |  +--rw sequence-duration         uint32
+     |  +--rw prach-patterns* [prach-pattern-id]
+     |     +--rw prach-pattern-id         uint16
+     |     +--rw number-of-repetitions    uint8
+     |     +--rw number-of-occasions      uint8
+     |     +--rw re-offset                uint32
+     |     +--rw occasion-parameters* [occasion-id]
+     |     |  +--rw occasion-id    uint8
+     |     |  +--rw cp-length      uint16
+     |     |  +--rw gp-length?     uint16
+     |     |  +--rw beam-id        uint16
+     |     +--rw frame-number             uint16
+     |     +--rw sub-frame-id             uint16
+     |     +--rw time-offset              uint16
+     +--rw static-srs-configurations* [static-srs-config-id] {o-ran-module-cap:SRS-STATIC-CONFIGURATION-SUPPORTED}?
+     |  +--rw static-srs-config-id    uint8
+     |  +--rw pattern-period          uint16
+     |  +--rw srs-patterns* [srs-pattern-id]
+     |     +--rw srs-pattern-id     uint16
+     |     +--rw sub-frame-id       uint16
+     |     +--rw slot-id            uint16
+     |     +--rw start-symbol-id    uint16
+     |     +--rw beam-id            uint16
+     |     +--rw num-symbol         uint16
+     |     +--rw start-prbc         uint16
+     |     +--rw num-prbc           uint16
+     +--rw configurable-tdd-patterns* [tdd-pattern-id] {o-ran-module-cap:CONFIGURABLE-TDD-PATTERN-SUPPORTED}?
+     |  +--rw tdd-pattern-id      uint8
+     |  +--rw switching-points* [switching-point-id]
+     |     +--rw switching-point-id    uint16
+     |     +--rw direction             enumeration
+     |     +--rw frame-offset          uint32
+     +--rw general-config
+        +--rw regularization-factor-se-configured?   boolean <false>
+        +--rw little-endian-byte-order?              boolean <false>
+
+  notifications:
+    +---n tx-array-carriers-state-change
+    |  +--ro tx-array-carriers* [name]
+    |     +--ro name     -> /user-plane-configuration/tx-array-carriers/name
+    |     +--ro state?   -> /user-plane-configuration/tx-array-carriers/state
+    +---n rx-array-carriers-state-change
+       +--ro rx-array-carriers* [name]
+          +--ro name     -> /user-plane-configuration/rx-array-carriers/name
+          +--ro state?   -> /user-plane-configuration/rx-array-carriers/state

@@ -1,0 +1,29 @@
+in dpd_api.c
+{ 不知道/mnt/sdcard/FIR/ADI_example1.txt這個東西做何之用
+    //fd = fopen ("/media/sd-mmcblk0p1/FIR/ADI_example1.txt", "r");
+	fd = fopen ("/mnt/sdcard/FIR/ADI_example1.txt", "r");
+	if (fd == NULL )
+	{
+		printf("Can't find CFR correlation pulse file name.\n");
+		fclose (fd);
+		//exit(0);
+	}
+}
+
+in M5_Platform_Event_Process_Func.c
+{ 不知道/mnt/sdcard/ADRV9025Init_StdUseCase13_nonLinkSharing.profile這個東西做何之用
+    if ((recoveryAction = adi_adrv9025_ConfigFileLoad(device, "/mnt/sdcard/ADRV9025Init_StdUseCase13_nonLinkSharing.profile", &adrv9025InitInst)) != ADI_COMMON_ACT_NO_ACTION)
+    {
+        printf("Error loading the requested profile to ADRV9025 init");
+        printf("ERROR: Error number %d, Recovery action %d. In file %s, in function %s, in line %d, variable name %s. Error message %s.\n",
+        device->common.error.errCode,
+        device->common.error.newAction,
+        device->common.error.errFile,
+        device->common.error.errFunc,
+        device->common.error.errLine,
+        device->common.error.varName,
+        device->common.error.errormessage);
+        /* Call action handler */
+        return ADI_COMMON_ACT_ERR_RESET_FULL;
+    }
+}

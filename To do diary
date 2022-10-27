@@ -30,7 +30,34 @@ ifconfig eth0 up
    3. 目前正在看mplane-file management內容
    4. how to use sftp in oru? need install sftp in petalinux?
 
+
 20220819
    1. 0822起看adrv9026.elf的src code
-   2. 主要看sync timing 改成 gps 或是關於5518控制的lib or code
-   3. 
+   2. 主要看sync ptp timing 改成 gps 或是關於5518控制的lib or code
+   3. gps程式 gps non?
+   4. 找燒fpga image的地方 (adi_adrv9025_ArmImageWrite)
+
+20220823
+   1. ptp2config
+   { 
+   (g)gps
+      (s)status : Print GPS Mode Status.
+      (p)ppsin :<enable|disable> Enable or Disable processing of GPS PPSIN
+      (t)todin :<enable|disable> Enable or Disable processing of GPS TODIN
+      (d)delay :<value> Change GPS PPS Offset Delay
+      (rs)rmcstatus :<ignore|process> Ignore or process TOD RMC Data receiver warning status
+   }
+   $ ptp2config g p enable //enable ppsin
+   $ ptp2config g t enable //enable todin
+   2. 
+
+20220908
+   1. v Lite_on.elf 需要commit一版新的src上去git server，同時確保一些路徑的path有沒有正確
+   2.   oam_agent for setItriInterfaces and setItriProcessing 還是會出現wait provision done，雖不影響整體使用，但還是希望可以改成processing
+   3. v swmgr for oru 有版本問題，建議可以新增一個branch for p2020ORU，同時要修改go.oru裡面swmgr的設定
+   4. v 寄mplane測試過的細項給jack
+
+
+20220920
+   1. v 修改SW_update時建立一個flag in uci files 可設定不要自動reboot (/usr/local/fwdownload/job) 可能會牽動到oam_agent and swmgr
+   2.
