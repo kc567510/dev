@@ -1,0 +1,73 @@
+參考:https://hackmd.io/H4QzySFIQYeLepkLVy_kMg
+參考:https://mattfife.com/?p=3576
+
+1.登入Gitserver
+    ssh liteon@172.19.67.22
+    
+    Username: liteon
+    Password: liteon
+
+    #用root權限
+    sudo su -
+    su -l git
+    
+    ll
+    #-rw-r--r--  1 git  git    612 Jan 17 14:28 .htpasswd
+
+    #輸入帳號
+    htpasswd .htpasswd  kevin
+    #New password: kevin
+    #Re-type new password: kevin
+    #Adding password for user kevin
+
+2.登入172.19.205.172(Builder Server)
+    sudo su -
+    cd /root/bin
+    ./AddNewSambaUser.sh
+
+    #Added user kevin
+    #Enabled user kevin
+    #kevin:x:1015:1015::/home/jason.yen:/bin/bash
+    #sambashare:x:114:gerry,jack,miles,henry,vincent,daniel,dale,len,johnson,max,zora,jason,kevin
+    #kevin:x:1015:
+    #passwd kevin
+    #Enter new UNIX password:  *****(kevin)
+    #Retype new UNIX password:  *****(kevin)
+
+3.用新帳號kevin 登入172.19.205.172 生成ssh key
+    mkdir .ssh
+    #kevin@server1:~$ pwd
+    #/home/kevin
+
+    #會問你key要放哪裡 就照他預設的複製貼上
+    ssh-keygen -t rsa -C "kevin"
+    
+    #pub key複製到git server上，之後記得要刪掉，這步沒有一定要
+    scp .ssh/id_rsa.pub git@172.19.67.22:/home/git/kevin_id_rsa.pub
+
+4.連線到git server(172.19.67.22)
+    git@cccgit:~$ pwd
+    #/home/git
+
+    cd .ssh
+    vi authorized_keys
+    
+    #在authorized_keys裡面增加id_rsa.pub的內容，然後:wq存檔離開
+    command="/home/git/gitolite/src/gitolite-shell kevin"
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLZf7zibtESj2h2L6TXMXkA+zbYzlDr4iEhrbiPn2qJXYWDT/XrKHJML8nG8mMdUTz70+/iN8TbvL9IetP5Pu3f4/vfRp2skJuMiXNZysBT8l4v/41Gsdp1IncKWhDCieX1FDB68nO+sAM0Twt5D3elWlI/wbj03fGWDemRUovXow3uguSlX3tqwYIAxnkR8i2Ez0b/C6sL5Dr3SQpJhqAXUfs0t2XoXISWSwM2Fwp7CzKs7P4Ob7iW15Yao2931W65gW8K5GKt/dmaZ0iS2a2EeO3lZoS6rkcBtkKCmCP+BPVz/EaQQvNPv3pUDi4VpiGGcqhoJVE5Kp0mz7sfSsB kevin
+
+5.用新帳號kevin 登入172.19.205.172
+    git config --global user.name "kevin"
+    git config --global user.email "kevin.chen@liteon.com"
+
+6.測試可不可以連上git web以及從git上面下載oru src code
+
+    mkdir test
+    cd test
+    git clone git@172.19.67.22:o-ru
+    cd o-ru
+    git checkout --track -b p2020_ORU origin/p2020_ORU
+    ./go.oru gitclone
+    ./go.oru make all
+
+    http://172.19.67.22/gitweb/
