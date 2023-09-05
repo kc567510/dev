@@ -19,3 +19,11 @@ git reset --hard 384ddd4 //回到版本384ddd4，切記回到之前版本別用 
 
  //如果已經git add之後想要全部反悔
  git reset HEAD .
+
+//upload new tag
+git tag v01.00.00
+git push --tags
+
+//delete loccal wrong tag
+git tag -d v01.00.00
+git push --tags
